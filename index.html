@@ -7,6 +7,15 @@
     <meta name="description" content="軽音サークル ライブ企画管理アプリ" />
     <!-- LIFF SDKをCDNから事前読み込み（LINEのwebviewにキャッシュされる） -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- GitHub Pages SPAリダイレクト処理 -->
+    <script>
+      (function() {
+        var r = new URLSearchParams(window.location.search).get('r')
+        if (r) {
+          window.history.replaceState(null, '', '/soundcity' + r)
+        }
+      })()
+    </script>
     <script type="module" crossorigin src="/soundcity/assets/index-B9i0GLXM.js"></script>
   </head>
   <body>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    // GitHub Pages用SPAリダイレクト
+    var path = window.location.pathname.replace('/soundcity', '') || '/'
+    var query = window.location.search
+    var hash = window.location.hash
+    var redirect = '/soundcity/?r=' + encodeURIComponent(path + query + hash)
+    window.location.replace(redirect)
+  </script>
+</head>
+<body></body>
+</html>

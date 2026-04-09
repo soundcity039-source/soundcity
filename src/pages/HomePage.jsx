@@ -100,7 +100,7 @@ export default function HomePage() {
         <div style={s.headerCircle2} />
         <div style={s.headerTop}>
           <div style={s.appName}>
-              <img src="/logo.jpg" alt="SoundCity" style={{ width: 42, height: 42, borderRadius: 12, objectFit: 'cover', border: '1.5px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
+              <img src="/soundcity/logo.jpg" alt="SoundCity" style={{ width: 42, height: 42, borderRadius: 12, objectFit: 'cover', border: '1.5px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
               <div style={s.appNameText}>SoundCityツール</div>
             </div>
           <div style={s.avatarWrap} onClick={() => navigate('/profile/edit')}>
@@ -132,7 +132,7 @@ export default function HomePage() {
           ))}
         </div>
         <a
-          href="/GUIDE.html"
+          href="/soundcity/GUIDE.html"
           target="_blank"
           rel="noreferrer"
           style={{

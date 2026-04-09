@@ -90,14 +90,14 @@ function LoginPage() {
     setLoading(true)
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: `${window.location.origin}/soundcity` },
     })
   }
 
   return (
     <div style={styles.loginPage}>
       <div style={styles.loginCard}>
-        <img src="/logo.jpg" alt="SoundCity" style={{ width: 110, height: 110, borderRadius: 22, objectFit: 'cover', marginBottom: 8, boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }} />
+        <img src="/soundcity/logo.jpg" alt="SoundCity" style={{ width: 110, height: 110, borderRadius: 22, objectFit: 'cover', marginBottom: 8, boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }} />
         <div style={styles.loginTitle}>SoundCityツール</div>
         <div style={styles.loginSub}>軽音サークル ライブ管理アプリ</div>
         <button style={styles.loginBtn} onClick={handleGoogleLogin} disabled={loading}>
@@ -218,7 +218,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/soundcity">
       <AppRoutes />
     </BrowserRouter>
   )

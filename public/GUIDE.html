@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundCityツール つかいかたガイド</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: #f8f4ff;
+    color: #2d2d2d;
+    line-height: 1.6;
+  }
+
+  /* ヒーローヘッダー */
+  .hero {
+    background: linear-gradient(135deg, #06C755 0%, #00a846 40%, #0ea5e9 100%);
+    padding: 48px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .hero-logo {
+    width: 90px; height: 90px;
+    border-radius: 22px;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.5);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .hero-emoji {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+  }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1px;
+    position: relative; z-index: 1;
+  }
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 8px;
+    position: relative; z-index: 1;
+  }
+  .hero-badge {
+    display: inline-block;
+    margin-top: 20px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 700;
+    position: relative; z-index: 1;
+    backdrop-filter: blur(8px);
+  }
+
+  /* メインコンテンツ */
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+  }
+
+  /* セクション */
+  .section {
+    margin-top: 32px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #06C755;
+    margin-bottom: 10px;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  /* カード */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    border: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 12px;
+  }
+
+  /* ステップカード */
+  .step-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    border: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 12px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #06C755, #00a846);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(6,199,85,0.3);
+  }
+  .step-body h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+  .step-body p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  /* 注意カード */
+  .alert-card {
+    background: #fff7ed;
+    border: 1.5px solid #fed7aa;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .alert-icon { font-size: 22px; flex-shrink: 0; line-height: 1.4; }
+  .alert-body { font-size: 14px; color: #7c3a0a; line-height: 1.6; }
+  .alert-body strong { font-weight: 800; display: block; margin-bottom: 2px; color: #c2410c; }
+
+  /* メニューグリッド */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .menu-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .menu-item-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .menu-item-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+  .menu-item-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+  .menu-item.green  { border-top: 3px solid #06C755; }
+  .menu-item.blue   { border-top: 3px solid #3b82f6; }
+  .menu-item.purple { border-top: 3px solid #8b5cf6; }
+  .menu-item.cyan   { border-top: 3px solid #06b6d4; }
+  .menu-item.pink   { border-top: 3px solid #ec4899; }
+  .menu-item.orange { border-top: 3px solid #f59e0b; }
+  .menu-item.gray   { border-top: 3px solid #64748b; }
+  .menu-item.red    { border-top: 3px solid #ef4444; }
+
+  /* タイムラインスタイルのステップ */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px; top: 16px; bottom: 16px;
+    width: 2px;
+    background: linear-gradient(to bottom, #06C755, #0ea5e9);
+    border-radius: 2px;
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .tl-dot {
+    position: absolute;
+    left: -22px; top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #06C755;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #06C755;
+  }
+  .tl-item h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+  .tl-item p {
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  /* バッジ */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-green  { background: #dcfce7; color: #166534; }
+  .badge-blue   { background: #dbeafe; color: #1e40af; }
+  .badge-gray   { background: #f1f5f9; color: #475569; }
+  .badge-orange { background: #ffedd5; color: #9a3412; }
+
+  /* テーブル */
+  .info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .info-table th {
+    background: #f8fafc;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.3px;
+  }
+  .info-table td {
+    padding: 10px 14px;
+    border-top: 1px solid #f1f5f9;
+    color: #334155;
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  /* FAQ */
+  .faq-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+    margin-bottom: 10px;
+  }
+  .faq-q {
+    font-size: 15px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 8px;
+  }
+  .faq-q::before {
+    content: 'Q';
+    background: #06C755;
+    color: #fff;
+    width: 24px; height: 24px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .faq-a {
+    font-size: 14px;
+    color: #64748b;
+    padding-left: 32px;
+    line-height: 1.6;
+  }
+
+  /* フッター */
+  .footer {
+    margin-top: 48px;
+    text-align: center;
+    padding: 32px 16px;
+    background: #1e293b;
+    border-radius: 24px 24px 0 0;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+  }
+  .footer strong { color: #fff; display: block; font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+  .footer a { color: #06C755; text-decoration: none; }
+
+  /* セパレーター */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+    margin: 8px 0 20px;
+  }
+
+  @media (max-width: 400px) {
+    .menu-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ヒーロー -->
+<div class="hero">
+  <img src="logo.jpg" alt="SoundCityツール" class="hero-logo" />
+  <h1>SoundCityツール</h1>
+  <p>軽音サークル ライブ管理アプリ</p>
+  <div class="hero-badge">✨ かんたん使い方ガイド</div>
+</div>
+
+<div class="container">
+
+  <!-- はじめに -->
+  <div class="section">
+    <div class="section-label">About</div>
+    <h2>SoundCityツールってなに？</h2>
+    <div class="card">
+      <p style="font-size:15px; color:#475569; line-height:1.8;">
+        SoundCityツールは軽音サークルのための<strong style="color:#06C755;">ライブ管理アプリ</strong>です。<br>
+        スマホのブラウザだけで、ライブへの応募・メンバー確認・練習室の予約など、サークル活動に必要なことがひとまとめにできます。
+      </p>
+    </div>
+  </div>
+
+  <!-- アクセス方法 -->
+  <div class="section">
+    <div class="section-label">Access</div>
+    <h2>アクセスする</h2>
+
+    <div class="alert-card">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body">
+        <strong>LINEアプリ内からは開けません！</strong>
+        LINEでURLをタップすると自動でChromeやSafariに切り替わります。もし切り替わらない場合はURLをコピーしてChromeで開いてください。
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>URLをChromeやSafariで開く</h3>
+        <p>
+          <a href="https://kasugayuji0716-art.github.io/soundcity" style="color:#06C755; font-weight:700;">
+            kasugayuji0716-art.github.io/soundcity
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>「Googleでログイン」をタップ</h3>
+        <p>普段使っているGoogleアカウントでログインしてください。</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>初回だけ プロフィールを登録する</h3>
+        <p>名前・学年・パートなどを入力して「登録する」を押せば完了！次回からはすぐホームに入れます。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- メニュー一覧 -->
+  <div class="section">
+    <div class="section-label">Menu</div>
+    <h2>できること一覧</h2>
+    <div class="menu-grid">
+      <div class="menu-item green">
+        <span class="menu-item-icon">🎸</span>
+        <div class="menu-item-name">ライブに応募する</div>
+        <div class="menu-item-desc">バンド名・曲数・メンバーを入力して応募</div>
+      </div>
+      <div class="menu-item blue">
+        <span class="menu-item-icon">📋</span>
+        <div class="menu-item-name">ライブ応募一覧</div>
+        <div class="menu-item-desc">自分の応募内容を確認・編集・取り消し</div>
+      </div>
+      <div class="menu-item purple">
+        <span class="menu-item-icon">👥</span>
+        <div class="menu-item-name">サークルメンバー</div>
+        <div class="menu-item-desc">メンバーのプロフィールを見る</div>
+      </div>
+      <div class="menu-item cyan">
+        <span class="menu-item-icon">🎵</span>
+        <div class="menu-item-name">練習室予約</div>
+        <div class="menu-item-desc">音楽練習室5のカレンダー予約</div>
+      </div>
+      <div class="menu-item pink">
+        <span class="menu-item-icon">🎬</span>
+        <div class="menu-item-name">過去ライブ動画</div>
+        <div class="menu-item-desc">アーカイブ動画をライブ別に視聴</div>
+      </div>
+      <div class="menu-item orange">
+        <span class="menu-item-icon">👤</span>
+        <div class="menu-item-name">プロフィール</div>
+        <div class="menu-item-desc">写真・名前・パートを編集</div>
+      </div>
+      <div class="menu-item gray">
+        <span class="menu-item-icon">✉️</span>
+        <div class="menu-item-name">運営へ連絡</div>
+        <div class="menu-item-desc">幹部へのお問い合わせ</div>
+      </div>
+      <div class="menu-item red">
+        <span class="menu-item-icon">⚙️</span>
+        <div class="menu-item-name">管理画面</div>
+        <div class="menu-item-desc">幹部専用メニュー</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ライブ応募 -->
+  <div class="section">
+    <div class="section-label">How to</div>
+    <h2>🎸 ライブに応募する</h2>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <h3>応募したいライブを選ぶ</h3>
+          <p>受付中のライブが表示されます。締切済みは選べません。</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <h3>バンド名と曲数を入力</h3>
+          <p>過去に使ったバンド構成を「テンプレートから引用」で呼び出すこともできます。</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <h3>各パートのメンバーを選択</h3>
+          <p>名前で検索してメンバーを選びます。未定のパートは空欄でもOK。</p>
+        </div>
+        <div class="tl-item" style="margin-bottom:0">
+          <div class="tl-dot" style="background:#0ea5e9; box-shadow: 0 0 0 2px #0ea5e9;"></div>
+          <h3>内容を確認して「送信」</h3>
+          <p>これで応募完了！締切前なら「ライブ応募一覧」から編集・取り消しもできます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 練習室予約 -->
+  <div class="section">
+    <div class="section-label">How to</div>
+    <h2>🎵 練習室を予約する</h2>
+
+    <div class="card" style="margin-bottom:12px;">
+      <p style="font-size:13px; font-weight:700; color:#64748b; margin-bottom:10px; letter-spacing:0.3px;">予約できる時間帯</p>
+      <table class="info-table">
+        <tr>
+          <th>枠</th>
+          <th>時間</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">1・2限</span></td>
+          <td>9:00 〜 12:30</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">3・4限</span></td>
+          <td>13:30 〜 17:00</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-orange">5・6限</span></td>
+          <td>17:10 〜 20:40</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>カレンダーで日付をタップ</h3>
+        <p>🟢緑=空き　🔵青=自分の予約　⚫グレー=埋まってる</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>予約したい枠を選んで入力</h3>
+        <p>「個人使用」か「バンド使用（企画名あり）」を選択して「予約する」。</p>
+      </div>
+    </div>
+
+    <div class="alert-card">
+      <span class="alert-icon">💡</span>
+      <div class="alert-body">
+        <strong>各枠は1グループのみ予約できます</strong>
+        すでに誰かが予約している枠は取れません。自分の予約は取り消すことができます。
+      </div>
+    </div>
+  </div>
+
+  <!-- 過去動画 -->
+  <div class="section">
+    <div class="section-label">How to</div>
+    <h2>🎬 過去ライブ動画を見る</h2>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <h3>ライブを選ぶ</h3>
+          <p>過去に行われたライブ一覧が表示されます。</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <h3>日程を選ぶ（1日目 / 2日目）</h3>
+          <p>何日開催だったかで絞り込めます。</p>
+        </div>
+        <div class="tl-item" style="margin-bottom:0">
+          <div class="tl-dot" style="background:#ec4899; box-shadow: 0 0 0 2px #ec4899;"></div>
+          <h3>企画を選んで再生</h3>
+          <p>YouTubeの動画がそのまま再生できます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-label">FAQ</div>
+    <h2>よくある質問</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">LINEからアクセスしたらエラーになる</div>
+      <div class="faq-a">LINEのブラウザはGoogleログインに対応していません。URLをコピーして<strong>Chrome</strong>または<strong>Safari</strong>で開いてください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">応募を取り消したい</div>
+      <div class="faq-a">「ライブ応募一覧」を開き、取り消したい企画の <strong>›</strong> を押して「取り消し」ボタンをタップ。<br>⚠️ 締切後は変更できないので幹部に連絡してください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">プロフィール写真を変えたい</div>
+      <div class="faq-a">ホーム右上のアイコン → 「プロフィール」から写真をタップして変更できます。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">管理画面に入れない</div>
+      <div class="faq-a">管理画面は<strong>幹部のみ</strong>アクセスできます。権限が必要な場合は幹部に連絡してください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">ページが古いまま表示される</div>
+      <div class="faq-a">ブラウザのキャッシュが残っている可能性があります。<br>
+      iPhone Safari: 設定 → Safari → 履歴とWebサイトデータを消去<br>
+      Android Chrome: <strong>Ctrl+Shift+R</strong> または設定 → キャッシュ消去
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- フッター -->
+<div style="padding: 0 16px;">
+  <div class="footer">
+    <strong>🎸 SoundCityツール</strong>
+    <a href="https://kasugayuji0716-art.github.io/soundcity">アプリを開く →</a>
+    <p style="margin-top:16px; font-size:11px;">困ったことがあれば運営メニューから幹部に連絡してください</p>
+  </div>
+</div>
+
+</body>
+</html>

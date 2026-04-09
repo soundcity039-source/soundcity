@@ -1,16 +1,28 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getLives, createLive, updateLive } from '../api.js'
+import { useApp } from '../context/AppContext.jsx'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f7f7f7', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
   header: {
-    background: '#2d3748', color: '#fff', padding: '16px 20px',
-    display: 'flex', alignItems: 'center', gap: 12, fontSize: 18, fontWeight: 700,
+    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+    color: '#fff', padding: '16px 20px 20px',
+    display: 'flex', alignItems: 'center', gap: 12,
+    position: 'relative', overflow: 'hidden',
+  },
+  headerCircle: {
+    position: 'absolute', top: -30, right: -30,
+    width: 120, height: 120, borderRadius: '50%',
+    background: 'rgba(255,255,255,0.04)', pointerEvents: 'none',
   },
   backBtn: {
-    background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', padding: 0,
+    background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff',
+    width: 36, height: 36, borderRadius: '50%',
+    fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0, position: 'relative',
   },
+  headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   addBtn: {
     width: '100%', padding: '12px', background: '#2d3748', color: '#fff',
@@ -84,6 +96,7 @@ function formatDatetimeForInput(dtStr) {
 
 export default function LiveManagePage() {
   const navigate = useNavigate()
+  const { currentUser } = useApp()
   const [lives, setLives] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -134,6 +147,7 @@ export default function LiveManagePage() {
     try {
       const payload = {
         ...form,
+        caller_uid: currentUser.line_uid,
         fee_flat: form.fee_flat ? Number(form.fee_flat) : null,
         fee_1plan: form.fee_1plan ? Number(form.fee_1plan) : null,
         fee_2plan: form.fee_2plan ? Number(form.fee_2plan) : null,
@@ -141,14 +155,14 @@ export default function LiveManagePage() {
       }
       if (editingLive) {
         const result = await updateLive({ ...payload, live_id: editingLive.live_id })
-        setLives(prev => prev.map(l => l.live_id === editingLive.live_id ? (result.live || { ...l, ...payload }) : l))
+        setLives(prev => prev.map(l => l.live_id === editingLive.live_id ? (result || { ...l, ...payload }) : l))
       } else {
         const result = await createLive(payload)
         setLives(prev => [...prev, result.live || result])
       }
       setShowModal(false)
     } catch (e) {
-      alert('エラーが発生しました。もう一度お試しください')
+      alert('エラー: ' + e.message)
     } finally {
       setSaving(false)
     }
@@ -157,8 +171,9 @@ export default function LiveManagePage() {
   return (
     <div style={s.page}>
       <div style={s.header}>
+        <div style={s.headerCircle} />
         <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
-        ライブ管理
+        <span style={s.headerTitle}>ライブ管理</span>
       </div>
       <div style={s.content}>
         <button style={s.addBtn} onClick={openAdd}>＋ 新規ライブ作成</button>

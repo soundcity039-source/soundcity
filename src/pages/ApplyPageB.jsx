@@ -6,41 +6,64 @@ import PartSelector from '../components/PartSelector.jsx'
 const PRESET_PARTS = ['Gt2', 'Key2', 'DJ', 'コーラス', 'Sax', 'その他']
 
 const s = {
-  page: { minHeight: '100vh', background: '#f7f7f7', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
   header: {
-    background: '#06C755', color: '#fff', padding: '16px 20px',
-    display: 'flex', alignItems: 'center', gap: 12, fontSize: 18, fontWeight: 700,
+    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    color: '#fff', padding: '16px 20px 20px',
+    display: 'flex', alignItems: 'center', gap: 12,
+    position: 'relative', overflow: 'hidden',
+  },
+  headerCircle: {
+    position: 'absolute', top: -30, right: -30,
+    width: 120, height: 120, borderRadius: '50%',
+    background: 'rgba(255,255,255,0.08)', pointerEvents: 'none',
   },
   backBtn: {
-    background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', padding: 0,
+    background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff',
+    width: 36, height: 36, borderRadius: '50%',
+    fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0,
   },
+  headerTitle: { fontSize: 17, fontWeight: 800, position: 'relative' },
+  stepIndicator: {
+    display: 'flex', gap: 4, alignItems: 'center', position: 'relative', marginLeft: 'auto',
+  },
+  step: { width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' },
+  stepActive: { background: '#fff', width: 20, borderRadius: 4 },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
-  card: { background: '#fff', borderRadius: 12, padding: '16px', marginBottom: 16 },
-  sectionTitle: { fontSize: 14, fontWeight: 700, color: '#555', marginBottom: 12 },
-  addPartArea: { marginTop: 12 },
+  card: {
+    background: '#fff', borderRadius: 16, padding: '16px',
+    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+    border: '1px solid rgba(0,0,0,0.04)',
+  },
+  sectionTitle: { fontSize: 13, fontWeight: 800, color: '#475569', marginBottom: 12, letterSpacing: 0.3 },
+  addPartArea: { marginTop: 14, paddingTop: 12, borderTop: '1px solid #f1f5f9' },
   addPartRow: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 },
   addSelect: {
-    flex: 1, padding: '8px 10px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 14, background: '#fff',
+    flex: 1, padding: '9px 10px', border: '1.5px solid #e2e8f0',
+    borderRadius: 10, fontSize: 14, background: '#f8fafc', outline: 'none',
   },
   addCustomInput: {
-    flex: 1, padding: '8px 10px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 14,
+    flex: 1, padding: '9px 10px', border: '1.5px solid #e2e8f0',
+    borderRadius: 10, fontSize: 14, background: '#f8fafc', outline: 'none',
   },
   addBtn: {
-    padding: '8px 14px', background: '#06C755', color: '#fff',
-    border: 'none', borderRadius: 8, fontSize: 14, cursor: 'pointer', fontWeight: 600,
+    padding: '9px 16px', background: '#06C755', color: '#fff',
+    border: 'none', borderRadius: 10, fontSize: 14, cursor: 'pointer', fontWeight: 700,
   },
   templateCheck: {
-    display: 'flex', alignItems: 'center', gap: 8,
+    display: 'flex', alignItems: 'center', gap: 10,
     padding: '12px 0', fontSize: 14, cursor: 'pointer',
+    color: '#334155', fontWeight: 500,
   },
-  checkbox: { width: 18, height: 18, cursor: 'pointer' },
-  error: { color: '#e53e3e', fontSize: 13, padding: '8px 0' },
+  checkbox: { width: 18, height: 18, cursor: 'pointer', accentColor: '#06C755' },
+  error: { color: '#ef4444', fontSize: 12, padding: '6px 0', fontWeight: 500 },
   nextBtn: {
-    width: '100%', padding: '14px', background: '#06C755',
-    color: '#fff', border: 'none', borderRadius: 10,
-    fontSize: 16, fontWeight: 700, cursor: 'pointer',
+    width: '100%', padding: '15px',
+    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    color: '#fff', border: 'none', borderRadius: 12,
+    fontSize: 16, fontWeight: 800, cursor: 'pointer',
+    boxShadow: '0 4px 16px rgba(6,199,85,0.3)',
   },
 }
 
@@ -94,8 +117,14 @@ export default function ApplyPageB() {
   return (
     <div style={s.page}>
       <div style={s.header}>
+        <div style={s.headerCircle} />
         <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
-        企画応募（2/3）
+        <span style={s.headerTitle}>企画応募</span>
+        <div style={s.stepIndicator}>
+          <div style={s.step} />
+          <div style={{ ...s.step, ...s.stepActive }} />
+          <div style={s.step} />
+        </div>
       </div>
       <div style={s.content}>
         <div style={s.card}>

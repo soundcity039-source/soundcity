@@ -4,7 +4,6 @@ const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
-  const [liff, setLiff] = useState(null)
   const [formState, setFormState] = useState({
     live_id: '',
     live_name: '',
@@ -16,7 +15,7 @@ export function AppProvider({ children }) {
   })
 
   return (
-    <AppContext.Provider value={{ currentUser, setCurrentUser, liff, setLiff, formState, setFormState }}>
+    <AppContext.Provider value={{ currentUser, setCurrentUser, formState, setFormState }}>
       {children}
     </AppContext.Provider>
   )

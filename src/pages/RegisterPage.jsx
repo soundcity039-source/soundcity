@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { registerMember } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
-import PhotoUpload from '../components/PhotoUpload.jsx'
+import { supabase } from '../lib/supabase.js'
 
 const MAIN_PARTS = ['Vo', 'ギタボ', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'Sax', 'その他']
 const WANT_PARTS_OPTIONS = ['Vo', 'ギタボ', 'Gt', 'Gt2', 'Ba', 'Dr', 'Key', 'Key2', 'DJ', 'コーラス', 'Sax', 'その他']
@@ -10,58 +10,81 @@ const GRADES = [1, 2, 3, 4]
 const GENDERS = ['男', '女', 'その他']
 
 const s = {
-  page: { minHeight: '100vh', background: '#f7f7f7', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
   header: {
-    background: '#06C755', color: '#fff', padding: '20px 20px 16px',
-    fontSize: 20, fontWeight: 700,
+    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    color: '#fff', padding: '28px 20px 20px',
+    position: 'relative', overflow: 'hidden',
   },
-  form: { padding: '20px 16px', maxWidth: 480, margin: '0 auto' },
-  card: { background: '#fff', borderRadius: 12, padding: '20px 16px', marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 6 },
-  required: { color: '#e53e3e', marginLeft: 4 },
+  headerCircle: {
+    position: 'absolute', top: -40, right: -40, width: 140, height: 140,
+    borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none',
+  },
+  headerTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' },
+  headerTitle: { fontSize: 22, fontWeight: 800, letterSpacing: -0.5 },
+  headerSub: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
+  logoutBtn: {
+    background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)',
+    color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+    padding: '6px 12px', borderRadius: 8,
+  },
+  form: { padding: '16px', maxWidth: 480, margin: '0 auto' },
+  card: {
+    background: '#fff', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+    border: '1px solid rgba(0,0,0,0.04)',
+  },
+  label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, letterSpacing: 0.3 },
+  required: { color: '#ef4444', marginLeft: 4 },
   input: {
-    width: '100%', padding: '10px 12px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 15, boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    borderRadius: 10, fontSize: 15, boxSizing: 'border-box',
+    background: '#f8fafc', outline: 'none',
   },
   select: {
-    width: '100%', padding: '10px 12px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 15, background: '#fff', boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    borderRadius: 10, fontSize: 15, background: '#f8fafc', boxSizing: 'border-box',
+    outline: 'none', appearance: 'none',
   },
-  checkboxGroup: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 },
+  checkboxGroup: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 },
   checkboxLabel: {
-    display: 'flex', alignItems: 'center', gap: 4,
-    padding: '6px 12px', border: '1px solid #ddd', borderRadius: 20,
-    fontSize: 13, cursor: 'pointer', userSelect: 'none',
+    display: 'flex', alignItems: 'center',
+    padding: '7px 14px', border: '1.5px solid #e2e8f0', borderRadius: 20,
+    fontSize: 13, fontWeight: 500, cursor: 'pointer', userSelect: 'none',
+    background: '#f8fafc', color: '#64748b',
   },
-  checkboxLabelActive: { borderColor: '#06C755', background: '#e6f9ed', color: '#06C755' },
-  fieldGroup: { marginBottom: 16 },
+  checkboxLabelActive: { borderColor: '#06C755', background: '#dcfce7', color: '#166534', fontWeight: 700 },
+  fieldGroup: { marginBottom: 18 },
   submitBtn: {
-    width: '100%', padding: '14px', background: '#06C755',
-    color: '#fff', border: 'none', borderRadius: 10,
-    fontSize: 16, fontWeight: 700, cursor: 'pointer',
-    marginTop: 8,
+    width: '100%', padding: '15px',
+    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    color: '#fff', border: 'none', borderRadius: 12,
+    fontSize: 16, fontWeight: 800, cursor: 'pointer', marginTop: 4,
+    boxShadow: '0 4px 16px rgba(6,199,85,0.3)',
+    letterSpacing: 0.3,
   },
-  error: { color: '#e53e3e', fontSize: 13, marginTop: 4 },
+  error: { color: '#ef4444', fontSize: 12, marginTop: 5, fontWeight: 500 },
 }
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { setCurrentUser, liff } = useApp()
-  const [formData, setFormData] = useState({
-    full_name: '',
-    photo_url: '',
-    grade: '',
-    gender: '',
-    main_part: '',
-    fav_bands: '',
-    want_parts: [],
-  })
+  const { setCurrentUser } = useApp()
+  const [formData, setFormData] = useState({ last_name: '', first_name: '', grade: '', gender: '', main_part: [], fav_bands: '', want_parts: [] })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
 
   function handleChange(field, value) {
     setFormData(prev => ({ ...prev, [field]: value }))
     setErrors(prev => ({ ...prev, [field]: null }))
+  }
+
+  function toggleMainPart(part) {
+    setFormData(prev => ({
+      ...prev,
+      main_part: prev.main_part.includes(part)
+        ? prev.main_part.filter(p => p !== part)
+        : [...prev.main_part, part],
+    }))
   }
 
   function toggleWantPart(part) {
@@ -75,53 +98,57 @@ export default function RegisterPage() {
 
   async function handleSubmit() {
     const newErrors = {}
-    if (!formData.full_name.trim()) newErrors.full_name = '名前を入力してください'
+    if (!formData.last_name.trim()) newErrors.last_name = '苗字を入力してください'
+    if (!formData.first_name.trim()) newErrors.first_name = '名前を入力してください'
     if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return }
-
+    const full_name = `${formData.last_name.trim()} ${formData.first_name.trim()}`
     setSubmitting(true)
     try {
-      let lineUid = 'dev-uid'
-      if (liff) {
-        const profile = await liff.getProfile()
-        lineUid = profile.userId
-      }
-      const payload = {
+      const member = await registerMember({
         ...formData,
-        line_uid: lineUid,
-        want_parts: formData.want_parts.join(','),
+        full_name,
         grade: formData.grade ? Number(formData.grade) : null,
-      }
-      const result = await registerMember(payload)
-      setCurrentUser(result.member || result)
+      })
+      setCurrentUser(member)
       navigate('/home')
     } catch (e) {
-      alert('エラーが発生しました。もう一度お試しください')
-      console.error(e)
+      alert('エラー: ' + e.message)
     } finally {
       setSubmitting(false)
     }
   }
 
+  async function handleLogout() {
+    await supabase.auth.signOut()
+  }
+
   return (
     <div style={s.page}>
-      <div style={s.header}>メンバー登録</div>
+      <div style={s.header}>
+        <div style={s.headerCircle} />
+        <div style={s.headerTop}>
+          <div>
+            <div style={s.headerTitle}>🎸 メンバー登録</div>
+            <div style={s.headerSub}>SoundCity へようこそ！</div>
+          </div>
+          <button style={s.logoutBtn} onClick={handleLogout}>ログアウト</button>
+        </div>
+      </div>
       <div style={s.form}>
         <div style={s.card}>
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <PhotoUpload currentUrl={formData.photo_url} onUpload={url => handleChange('photo_url', url)} />
-          </div>
-
           <div style={s.fieldGroup}>
-            <label style={s.label}>フルネーム<span style={s.required}>*</span></label>
-            <input
-              style={s.input}
-              placeholder="山田 太郎"
-              value={formData.full_name}
-              onChange={e => handleChange('full_name', e.target.value)}
-            />
-            {errors.full_name && <div style={s.error}>{errors.full_name}</div>}
+            <label style={s.label}>氏名<span style={s.required}>*</span></label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div>
+                <input style={s.input} placeholder="山田（苗字）" value={formData.last_name} onChange={e => handleChange('last_name', e.target.value)} />
+                {errors.last_name && <div style={s.error}>{errors.last_name}</div>}
+              </div>
+              <div>
+                <input style={s.input} placeholder="太郎（名前）" value={formData.first_name} onChange={e => handleChange('first_name', e.target.value)} />
+                {errors.first_name && <div style={s.error}>{errors.first_name}</div>}
+              </div>
+            </div>
           </div>
-
           <div style={s.fieldGroup}>
             <label style={s.label}>学年</label>
             <select style={s.select} value={formData.grade} onChange={e => handleChange('grade', e.target.value)}>
@@ -129,7 +156,6 @@ export default function RegisterPage() {
               {GRADES.map(g => <option key={g} value={g}>{g}年生</option>)}
             </select>
           </div>
-
           <div style={s.fieldGroup}>
             <label style={s.label}>性別</label>
             <select style={s.select} value={formData.gender} onChange={e => handleChange('gender', e.target.value)}>
@@ -137,49 +163,33 @@ export default function RegisterPage() {
               {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
           </div>
-
           <div style={s.fieldGroup}>
-            <label style={s.label}>メインパート</label>
-            <select style={s.select} value={formData.main_part} onChange={e => handleChange('main_part', e.target.value)}>
-              <option value="">選択してください</option>
-              {MAIN_PARTS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+            <label style={s.label}>メインパート（複数選択可）</label>
+            <div style={s.checkboxGroup}>
+              {MAIN_PARTS.map(p => (
+                <label key={p} style={{ ...s.checkboxLabel, ...(formData.main_part.includes(p) ? s.checkboxLabelActive : {}) }}>
+                  <input type="checkbox" style={{ display: 'none' }} checked={formData.main_part.includes(p)} onChange={() => toggleMainPart(p)} />
+                  {p}
+                </label>
+              ))}
+            </div>
           </div>
-
           <div style={s.fieldGroup}>
             <label style={s.label}>好きなバンド・アーティスト</label>
-            <input
-              style={s.input}
-              placeholder="例：RADWIMPS, Mr.Children"
-              value={formData.fav_bands}
-              onChange={e => handleChange('fav_bands', e.target.value)}
-            />
+            <input style={s.input} placeholder="例：RADWIMPS, Mr.Children" value={formData.fav_bands} onChange={e => handleChange('fav_bands', e.target.value)} />
           </div>
-
           <div style={s.fieldGroup}>
             <label style={s.label}>いつかやりたいパート</label>
             <div style={s.checkboxGroup}>
               {WANT_PARTS_OPTIONS.map(p => (
-                <label
-                  key={p}
-                  style={{
-                    ...s.checkboxLabel,
-                    ...(formData.want_parts.includes(p) ? s.checkboxLabelActive : {}),
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    style={{ display: 'none' }}
-                    checked={formData.want_parts.includes(p)}
-                    onChange={() => toggleWantPart(p)}
-                  />
+                <label key={p} style={{ ...s.checkboxLabel, ...(formData.want_parts.includes(p) ? s.checkboxLabelActive : {}) }}>
+                  <input type="checkbox" style={{ display: 'none' }} checked={formData.want_parts.includes(p)} onChange={() => toggleWantPart(p)} />
                   {p}
                 </label>
               ))}
             </div>
           </div>
         </div>
-
         <button style={s.submitBtn} onClick={handleSubmit} disabled={submitting}>
           {submitting ? '送信中...' : '登録する'}
         </button>

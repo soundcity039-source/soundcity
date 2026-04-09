@@ -1,48 +1,102 @@
 import { useNavigate } from 'react-router-dom'
-
-const s = {
-  page: { minHeight: '100vh', background: '#f7f7f7' },
-  header: {
-    background: '#2d3748', color: '#fff', padding: '20px 20px 16px',
-    display: 'flex', alignItems: 'center', gap: 12,
-  },
-  backBtn: {
-    background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', padding: 0,
-  },
-  title: { fontSize: 20, fontWeight: 700 },
-  content: { padding: '24px 16px', maxWidth: 480, margin: '0 auto' },
-  menuGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  menuCard: {
-    background: '#fff', borderRadius: 12, padding: '24px 16px',
-    display: 'flex', flexDirection: 'column', alignItems: 'center',
-    gap: 8, cursor: 'pointer', border: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-  },
-  menuIcon: { fontSize: 36 },
-  menuLabel: { fontSize: 15, fontWeight: 600, color: '#333' },
-}
+import { useApp } from '../context/AppContext.jsx'
 
 const menus = [
-  { label: 'ライブ管理', icon: '🎤', path: '/admin/lives' },
-  { label: 'タイムテーブル', icon: '📅', path: '/admin/timetable' },
-  { label: '出演費管理', icon: '💰', path: '/admin/fees' },
-  { label: 'メンバー管理', icon: '👥', path: '/admin/members' },
+  { label: 'ライブ管理', icon: '🎤', path: '/admin/lives', color: '#fee2e2', desc: 'ライブの作成・編集' },
+  { label: 'タイムテーブル', icon: '📅', path: '/admin/timetable', color: '#dbeafe', desc: '出演順の管理' },
+  { label: '出演費管理', icon: '💰', path: '/admin/fees', color: '#dcfce7', desc: '費用の集計・確認' },
+  { label: 'メンバー管理', icon: '👥', path: '/admin/members',     color: '#ede9fe', desc: '在籍・役職の管理' },
+  { label: 'ライブ動画管理', icon: '🎬', path: '/admin/live-videos', color: '#fce7f3', desc: '過去ライブ動画の編集' },
 ]
+
+const s = {
+  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  header: {
+    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+    color: '#fff', padding: '28px 20px 72px',
+    position: 'relative', overflow: 'hidden',
+  },
+  headerCircle1: {
+    position: 'absolute', top: -40, right: -40,
+    width: 160, height: 160, borderRadius: '50%',
+    background: 'rgba(255,255,255,0.04)', pointerEvents: 'none',
+  },
+  headerCircle2: {
+    position: 'absolute', bottom: -20, left: -20,
+    width: 100, height: 100, borderRadius: '50%',
+    background: 'rgba(255,255,255,0.03)', pointerEvents: 'none',
+  },
+  headerTop: { display: 'flex', alignItems: 'center', gap: 12, position: 'relative' },
+  backBtn: {
+    background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff',
+    width: 36, height: 36, borderRadius: '50%',
+    fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  badge: {
+    fontSize: 10, fontWeight: 700, color: '#06C755',
+    background: 'rgba(6,199,85,0.15)', padding: '3px 8px',
+    borderRadius: 6, border: '1px solid rgba(6,199,85,0.3)',
+  },
+  greeting: { marginTop: 16, position: 'relative' },
+  greetingLabel: { fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 1 },
+  greetingTitle: { fontSize: 24, fontWeight: 800, color: '#fff', marginTop: 4, letterSpacing: -0.5 },
+  cardWrap: {
+    margin: '-48px 16px 0',
+    background: '#fff',
+    borderRadius: 20,
+    boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+    padding: '8px 8px 16px',
+  },
+  grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, padding: '8px 4px 0' },
+  menuCard: {
+    display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+    padding: '16px', borderRadius: 14, cursor: 'pointer',
+    border: 'none', textAlign: 'left',
+    transition: 'transform 0.12s',
+    position: 'relative', overflow: 'hidden',
+  },
+  iconCircle: {
+    width: 44, height: 44, borderRadius: 12,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 22, marginBottom: 10,
+    background: 'rgba(255,255,255,0.6)',
+  },
+  menuLabel: { fontSize: 14, fontWeight: 800, color: '#1e293b', marginBottom: 2 },
+  menuDesc: { fontSize: 11, color: '#64748b', fontWeight: 500 },
+  arrow: { position: 'absolute', right: 12, bottom: 14, fontSize: 12, color: '#94a3b8' },
+}
 
 export default function AdminHomePage() {
   const navigate = useNavigate()
+  const { currentUser } = useApp()
 
   return (
     <div style={s.page}>
       <div style={s.header}>
-        <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
-        <span style={s.title}>管理画面</span>
+        <div style={s.headerCircle1} />
+        <div style={s.headerCircle2} />
+        <div style={s.headerTop}>
+          <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
+          <span style={s.badge}>⚙️ 管理者専用</span>
+        </div>
+        <div style={s.greeting}>
+          <div style={s.greetingLabel}>ADMIN PANEL</div>
+          <div style={s.greetingTitle}>{currentUser?.full_name || '管理者'} さん</div>
+        </div>
       </div>
-      <div style={s.content}>
-        <div style={s.menuGrid}>
+      <div style={s.cardWrap}>
+        <div style={s.grid}>
           {menus.map(menu => (
-            <button key={menu.path} style={s.menuCard} onClick={() => navigate(menu.path)}>
-              <span style={s.menuIcon}>{menu.icon}</span>
+            <button
+              key={menu.path}
+              className="menu-card"
+              style={{ ...s.menuCard, background: menu.color }}
+              onClick={() => navigate(menu.path)}
+            >
+              <div style={s.iconCircle}>{menu.icon}</div>
               <span style={s.menuLabel}>{menu.label}</span>
+              <span style={s.menuDesc}>{menu.desc}</span>
+              <span style={s.arrow}>→</span>
             </button>
           ))}
         </div>

@@ -3,35 +3,66 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f7f7f7' },
+  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
   header: {
-    background: '#06C755', color: '#fff', padding: '16px 20px',
-    display: 'flex', alignItems: 'center', gap: 12, fontSize: 18, fontWeight: 700,
+    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    color: '#fff', padding: '16px 20px 20px',
+    display: 'flex', alignItems: 'center', gap: 12,
+    position: 'relative', overflow: 'hidden',
+  },
+  headerCircle: {
+    position: 'absolute', top: -30, right: -30,
+    width: 120, height: 120, borderRadius: '50%',
+    background: 'rgba(255,255,255,0.08)', pointerEvents: 'none',
   },
   backBtn: {
-    background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', padding: 0,
+    background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff',
+    width: 36, height: 36, borderRadius: '50%',
+    fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0,
   },
-  content: { padding: '20px 16px', maxWidth: 480, margin: '0 auto' },
-  card: { background: '#fff', borderRadius: 12, padding: '20px 16px', marginBottom: 16 },
-  liveLabel: { fontSize: 13, color: '#888', marginBottom: 4 },
-  liveName: { fontWeight: 700, color: '#333', fontSize: 16 },
-  fieldGroup: { marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 6 },
-  required: { color: '#e53e3e', marginLeft: 4 },
+  headerTitle: { fontSize: 17, fontWeight: 800, position: 'relative' },
+  stepIndicator: {
+    display: 'flex', gap: 4, alignItems: 'center', position: 'relative', marginLeft: 'auto',
+  },
+  step: { width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.35)' },
+  stepActive: { background: '#fff', width: 20, borderRadius: 4 },
+  content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
+  liveCard: {
+    background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+    borderRadius: 14, padding: '14px 16px', marginBottom: 12,
+    border: '1px solid #86efac',
+    display: 'flex', alignItems: 'center', gap: 10,
+  },
+  liveIcon: { fontSize: 24 },
+  liveInfo: {},
+  liveLabel: { fontSize: 11, color: '#166534', fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 },
+  liveName: { fontWeight: 800, color: '#14532d', fontSize: 15 },
+  card: {
+    background: '#fff', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+    border: '1px solid rgba(0,0,0,0.04)',
+  },
+  fieldGroup: { marginBottom: 18 },
+  label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, letterSpacing: 0.3 },
+  required: { color: '#ef4444', marginLeft: 4 },
   input: {
-    width: '100%', padding: '10px 12px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 15, boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    borderRadius: 10, fontSize: 15, boxSizing: 'border-box',
+    background: '#f8fafc', outline: 'none',
   },
-  error: { color: '#e53e3e', fontSize: 13, marginTop: 4 },
+  error: { color: '#ef4444', fontSize: 12, marginTop: 5, fontWeight: 500 },
   templateBtn: {
-    width: '100%', padding: '12px', background: '#fff',
-    border: '1px dashed #06C755', borderRadius: 8, color: '#06C755',
-    fontSize: 14, fontWeight: 600, cursor: 'pointer', marginBottom: 16,
+    width: '100%', padding: '13px', background: '#fff',
+    border: '1.5px dashed #06C755', borderRadius: 12, color: '#06C755',
+    fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 12,
   },
   nextBtn: {
-    width: '100%', padding: '14px', background: '#06C755',
-    color: '#fff', border: 'none', borderRadius: 10,
-    fontSize: 16, fontWeight: 700, cursor: 'pointer',
+    width: '100%', padding: '15px',
+    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    color: '#fff', border: 'none', borderRadius: 12,
+    fontSize: 16, fontWeight: 800, cursor: 'pointer',
+    boxShadow: '0 4px 16px rgba(6,199,85,0.3)',
   },
 }
 
@@ -71,14 +102,23 @@ export default function ApplyPageA() {
   return (
     <div style={s.page}>
       <div style={s.header}>
+        <div style={s.headerCircle} />
         <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
-        企画応募（1/3）
+        <span style={s.headerTitle}>企画応募</span>
+        <div style={s.stepIndicator}>
+          <div style={{ ...s.step, ...s.stepActive }} />
+          <div style={s.step} />
+          <div style={s.step} />
+        </div>
       </div>
       <div style={s.content}>
         {formState.live_name && (
-          <div style={s.card}>
-            <div style={s.liveLabel}>応募先ライブ</div>
-            <div style={s.liveName}>{formState.live_name}</div>
+          <div style={s.liveCard}>
+            <span style={s.liveIcon}>🎤</span>
+            <div style={s.liveInfo}>
+              <div style={s.liveLabel}>応募先ライブ</div>
+              <div style={s.liveName}>{formState.live_name}</div>
+            </div>
           </div>
         )}
         <div style={s.card}>

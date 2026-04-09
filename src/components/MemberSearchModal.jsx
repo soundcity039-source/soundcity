@@ -61,15 +61,26 @@ const s = {
   },
 }
 
+function getParts(member) {
+  if (!member.main_part) return []
+  return member.main_part.split(',').filter(Boolean)
+}
+
 function filterByPart(members, selectedPart) {
   if (!selectedPart) return members
   if (selectedPart === 'Vo') {
-    return members.filter(m => m.main_part === 'Vo' || m.main_part === 'ギタボ')
+    return members.filter(m => {
+      const parts = getParts(m)
+      return parts.includes('Vo') || parts.includes('ギタボ')
+    })
   }
   if (selectedPart === 'Gt') {
-    return members.filter(m => m.main_part === 'Gt' || m.main_part === 'ギタボ')
+    return members.filter(m => {
+      const parts = getParts(m)
+      return parts.includes('Gt') || parts.includes('ギタボ')
+    })
   }
-  return members.filter(m => m.main_part === selectedPart)
+  return members.filter(m => getParts(m).includes(selectedPart))
 }
 
 export default function MemberSearchModal({ onSelect, onClose, disabledMemberIds = [], defaultPart = '' }) {
@@ -145,7 +156,11 @@ export default function MemberSearchModal({ onSelect, onClose, disabledMemberIds
                 <div style={s.info}>
                   <div style={s.name}>{m.full_name}</div>
                   <div style={s.sub}>
-                    {[m.main_part, m.grade ? `${m.grade}年` : null, m.gender].filter(Boolean).join(' / ')}
+                    {[
+                      m.main_part ? m.main_part.split(',').filter(Boolean).join('/') : null,
+                      m.grade ? `${m.grade}年` : null,
+                      m.gender,
+                    ].filter(Boolean).join(' / ')}
                   </div>
                 </div>
                 {isDisabled && <span style={{ fontSize: 12, color: '#999' }}>選択済</span>}

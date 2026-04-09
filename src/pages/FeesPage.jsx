@@ -3,14 +3,25 @@ import { useNavigate } from 'react-router-dom'
 import { getLives, getFees } from '../api.js'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f7f7f7', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
   header: {
-    background: '#2d3748', color: '#fff', padding: '16px 20px',
-    display: 'flex', alignItems: 'center', gap: 12, fontSize: 18, fontWeight: 700,
+    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+    color: '#fff', padding: '16px 20px 20px',
+    display: 'flex', alignItems: 'center', gap: 12,
+    position: 'relative', overflow: 'hidden',
+  },
+  headerCircle: {
+    position: 'absolute', top: -30, right: -30,
+    width: 120, height: 120, borderRadius: '50%',
+    background: 'rgba(255,255,255,0.04)', pointerEvents: 'none',
   },
   backBtn: {
-    background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer', padding: 0,
+    background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff',
+    width: 36, height: 36, borderRadius: '50%',
+    fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0, position: 'relative',
   },
+  headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   select: {
     width: '100%', padding: '10px 12px', border: '1px solid #ddd',
@@ -78,8 +89,9 @@ export default function FeesPage() {
   return (
     <div style={s.page}>
       <div style={s.header}>
+        <div style={s.headerCircle} />
         <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
-        出演費管理
+        <span style={s.headerTitle}>出演費管理</span>
       </div>
       <div style={s.content}>
         <select style={s.select} value={selectedLiveId} onChange={e => setSelectedLiveId(e.target.value)}>
@@ -111,8 +123,8 @@ export default function FeesPage() {
                         key={f.member_id}
                         style={{ ...s.tableRow, ...(paid[f.member_id] ? s.tableRowPaid : {}) }}
                       >
-                        <span style={s.memberName}>{f.full_name}</span>
-                        <span style={s.cell}>{f.plan_count}企画</span>
+                        <span style={s.memberName}>{f.member?.full_name}</span>
+                        <span style={s.cell}>{f.count}企画</span>
                         <span style={s.amount}>¥{(f.fee || 0).toLocaleString()}</span>
                         <div style={{ textAlign: 'center' }}>
                           <input

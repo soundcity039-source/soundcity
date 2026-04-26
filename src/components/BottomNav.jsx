@@ -13,11 +13,11 @@ const tabs = [
 const s = {
   nav: {
     position: 'fixed', bottom: 0, left: 0, right: 0,
-    background: '#0f172a',
+    background: 'var(--nav-bg)',
     display: 'flex', justifyContent: 'space-around', alignItems: 'center',
     padding: '8px 4px calc(8px + env(safe-area-inset-bottom))',
     zIndex: 100,
-    borderTop: '1px solid rgba(255,255,255,0.06)',
+    borderTop: '1px solid var(--nav-border)',
   },
   tab: {
     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -29,10 +29,10 @@ const s = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     transition: 'background 0.15s',
   },
-  pillActive: { background: 'rgba(6, 199, 85, 0.18)' },
+  pillActive: { background: 'var(--nav-active-bg)' },
   icon: { fontSize: 20, lineHeight: 1 },
   label: { fontSize: 9, color: '#475569', fontWeight: 500 },
-  labelActive: { fontSize: 9, color: '#06C755', fontWeight: 700 },
+  labelActive: { fontSize: 9, color: 'var(--nav-active)', fontWeight: 700 },
 }
 
 export default function BottomNav() {

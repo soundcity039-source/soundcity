@@ -1,12 +1,23 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getPlans, deletePlan, getLives, createTemplate } from '../api.js'
+import { getMyPlans, deletePlan, getLives, createTemplate } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
 
+function parseSeNote(seNote) {
+  if (!seNote) return []
+  const lines = seNote.split('\n')
+  const items = []
+  if (lines[0]?.trim()) items.push({ label: 'SE', value: lines[0].trim() })
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i]?.trim()) items.push({ label: `${i}曲目`, value: lines[i].trim() })
+  }
+  return items
+}
+
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -25,9 +36,9 @@ const s = {
   headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
   content: { padding: '10px 12px', maxWidth: 480, margin: '0 auto' },
   card: {
-    background: '#fff', borderRadius: 12, marginBottom: 8,
-    boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)', overflow: 'hidden',
+    background: 'var(--card-bg)', borderRadius: 12, marginBottom: 8,
+    boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)', overflow: 'hidden',
   },
   cardMain: {
     padding: '10px 14px 10px',
@@ -48,11 +59,13 @@ const s = {
   partsWrap: { display: 'flex', flexWrap: 'wrap', gap: 4 },
   partChip: {
     fontSize: 11, padding: '2px 7px', borderRadius: 6,
-    background: '#f8f4ff', color: '#5b21b6', fontWeight: 600, whiteSpace: 'nowrap',
+    background: '#f8f4ff', color: '#5b21b6', fontWeight: 600,
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%',
   },
   partChipEmpty: {
     fontSize: 11, padding: '2px 7px', borderRadius: 6,
-    background: '#f1f5f9', color: '#94a3b8', fontWeight: 500, whiteSpace: 'nowrap',
+    background: '#f1f5f9', color: '#94a3b8', fontWeight: 500,
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%',
   },
   chevron: { fontSize: 14, color: '#94a3b8', marginTop: 2, flexShrink: 0, transition: 'transform 0.15s' },
   // Expanded area
@@ -67,13 +80,20 @@ const s = {
   },
   partMember: { color: '#334155', fontSize: 13 },
   partEmpty: { color: '#94a3b8', fontStyle: 'italic', fontSize: 13 },
+  noteSection: { marginTop: 10, paddingTop: 8, borderTop: '1px solid #f8fafc' },
+  noteBlock: { marginBottom: 8 },
+  noteLabel: { fontSize: 11, fontWeight: 700, color: '#64748b', marginBottom: 3 },
+  noteValue: { fontSize: 12, color: 'var(--text)', whiteSpace: 'pre-wrap', background: 'var(--page-bg)', borderRadius: 6, padding: '5px 8px' },
+  seRow: { display: 'flex', gap: 8, marginBottom: 2 },
+  seRowLabel: { fontSize: 11, fontWeight: 700, color: '#6366f1', minWidth: 40 },
+  seRowValue: { fontSize: 12, color: 'var(--text)' },
   actionRow: { display: 'flex', gap: 6, marginTop: 10 },
   editBtn:     { flex: 1, padding: '8px', background: '#dcfce7', border: 'none', borderRadius: 8, color: '#166534', fontWeight: 700, fontSize: 12, cursor: 'pointer' },
   deleteBtn:   { flex: 1, padding: '8px', background: '#fee2e2', border: 'none', borderRadius: 8, color: '#991b1b', fontWeight: 700, fontSize: 12, cursor: 'pointer' },
   templateBtn: { flex: 1, padding: '8px', background: '#ede9fe', border: 'none', borderRadius: 8, color: '#5b21b6', fontWeight: 700, fontSize: 12, cursor: 'pointer' },
-  empty:   { textAlign: 'center', color: '#94a3b8', padding: '60px 20px', fontSize: 15, fontWeight: 500 },
+  empty:   { textAlign: 'center', color: 'var(--text-muted)', padding: '60px 20px', fontSize: 15, fontWeight: 500 },
   emptyIcon: { fontSize: 48, marginBottom: 12 },
-  loading: { textAlign: 'center', color: '#94a3b8', padding: 40 },
+  loading: { textAlign: 'center', color: 'var(--text-muted)', padding: 40 },
 }
 
 export default function ApplicationListPage() {
@@ -86,7 +106,7 @@ export default function ApplicationListPage() {
 
   useEffect(() => {
     Promise.all([
-      getPlans({ leader_id: currentUser.member_id }),
+      getMyPlans(currentUser.member_id),
       getLives({}),
     ])
       .then(([plansRes, livesRes]) => {
@@ -123,6 +143,10 @@ export default function ApplicationListPage() {
       parts: (plan.casts || []).map(c => ({ part: c.part, member: c.member || null })),
       save_as_template: false,
       editing_plan_id: plan.plan_id,
+      mic_note: plan.mic_note || '',
+      sound_note: plan.sound_note || '',
+      se_note: plan.se_note || '',
+      light_note: plan.light_note || '',
     })
     navigate('/apply/a')
   }
@@ -170,6 +194,7 @@ export default function ApplicationListPage() {
           const canEdit = isBeforeDeadline(plan)
           const isOpen  = expanded.has(plan.plan_id)
           const casts   = plan.casts || []
+          const isOwn   = plan.leader_id === currentUser.member_id
 
           return (
             <div key={plan.plan_id} style={s.card} className="tap-card">
@@ -180,6 +205,7 @@ export default function ApplicationListPage() {
                   <div style={s.liveMeta}>
                     <span style={s.liveTag}>{live?.live_name || 'ライブ名不明'}</span>
                     <span style={s.songTag}>{plan.song_count}曲</span>
+                    <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600 }}>代表：{plan.leader?.full_name || '不明'}</span>
                   </div>
                   {/* Parts summary chips */}
                   <div style={s.partsWrap}>
@@ -204,9 +230,46 @@ export default function ApplicationListPage() {
                       </span>
                     </div>
                   ))}
+
+                  {(plan.mic_note || plan.sound_note || parseSeNote(plan.se_note).length > 0 || plan.light_note) && (
+                    <div style={s.noteSection}>
+                      {plan.mic_note && (
+                        <div style={s.noteBlock}>
+                          <div style={s.noteLabel}>マイク</div>
+                          <div style={s.noteValue}>{plan.mic_note}</div>
+                        </div>
+                      )}
+                      {plan.sound_note && (
+                        <div style={s.noteBlock}>
+                          <div style={s.noteLabel}>音響要望</div>
+                          <div style={s.noteValue}>{plan.sound_note}</div>
+                        </div>
+                      )}
+                      {parseSeNote(plan.se_note).length > 0 && (
+                        <div style={s.noteBlock}>
+                          <div style={s.noteLabel}>SE・曲目</div>
+                          <div style={{ background: 'var(--page-bg)', borderRadius: 6, padding: '5px 8px' }}>
+                            {parseSeNote(plan.se_note).map((item, i) => (
+                              <div key={i} style={s.seRow}>
+                                <span style={s.seRowLabel}>{item.label}</span>
+                                <span style={s.seRowValue}>{item.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {plan.light_note && (
+                        <div style={s.noteBlock}>
+                          <div style={s.noteLabel}>照明</div>
+                          <div style={s.noteValue}>{plan.light_note}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div style={s.actionRow}>
-                    <button style={s.templateBtn} onClick={() => handleSaveTemplate(plan)}>テンプレ保存</button>
-                    {canEdit && (
+                    {isOwn && <button style={s.templateBtn} onClick={() => handleSaveTemplate(plan)}>テンプレ保存</button>}
+                    {isOwn && canEdit && (
                       <>
                         <button style={s.editBtn} onClick={() => handleEdit(plan)}>編集</button>
                         <button style={s.deleteBtn} onClick={() => handleDelete(plan)}>取り消し</button>

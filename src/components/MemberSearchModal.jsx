@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getMembers } from '../api.js'
 
-const PARTS = ['Vo', 'ギタボ', 'Gt', 'Ba', 'Dr', 'Key', 'Gt2', 'Key2', 'DJ', 'コーラス', 'Sax', 'その他']
+const PARTS = ['Vo', 'Gt', 'Ba', 'Dr', 'Key', 'Gt2', 'Key2', 'DJ', 'コーラス', 'Sax', 'その他']
 const GRADES = [1, 2, 3, 4]
 const GENDERS = ['男', '女', 'その他']
 
@@ -12,52 +12,54 @@ const s = {
     zIndex: 1000,
   },
   modal: {
-    background: '#fff', borderRadius: '16px 16px 0 0',
+    background: 'var(--card-bg)', borderRadius: '16px 16px 0 0',
     width: '100%', maxWidth: 480, maxHeight: '85vh',
     display: 'flex', flexDirection: 'column', overflow: 'hidden',
+    color: 'var(--text)',
   },
   header: {
-    padding: '16px 20px', borderBottom: '1px solid #eee',
+    padding: '16px 20px', borderBottom: '1px solid var(--border)',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     fontWeight: 700, fontSize: 18,
   },
   closeBtn: {
-    background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#666',
+    background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: 'var(--text-muted)',
   },
-  filterArea: { padding: '12px 16px', borderBottom: '1px solid #eee' },
+  filterArea: { padding: '12px 16px', borderBottom: '1px solid var(--border)' },
   searchInput: {
-    width: '100%', padding: '10px 12px', border: '1px solid #ddd',
+    width: '100%', padding: '10px 12px', border: '1px solid var(--border)',
     borderRadius: 8, fontSize: 15, boxSizing: 'border-box', marginBottom: 8,
+    background: 'var(--input-bg)', color: 'var(--text)',
   },
   filterRow: { display: 'flex', gap: 8, flexWrap: 'wrap' },
   filterSelect: {
-    padding: '6px 10px', border: '1px solid #ddd', borderRadius: 6,
-    fontSize: 13, background: '#fff',
+    padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 6,
+    fontSize: 13, background: 'var(--input-bg)', color: 'var(--text)',
   },
   list: { overflowY: 'auto', flex: 1 },
   memberItem: {
     display: 'flex', alignItems: 'center', padding: '12px 16px',
-    borderBottom: '1px solid #f0f0f0', cursor: 'pointer',
+    borderBottom: '1px solid var(--border)', cursor: 'pointer',
     transition: 'background 0.1s',
   },
   avatar: {
-    width: 44, height: 44, borderRadius: '50%', background: '#ddd',
+    width: 44, height: 44, borderRadius: '50%', background: 'var(--border)',
     marginRight: 12, objectFit: 'cover', flexShrink: 0,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 18, color: '#888',
+    fontSize: 18, color: 'var(--text-muted)',
   },
   info: { flex: 1 },
   name: { fontWeight: 600, fontSize: 15 },
-  sub: { fontSize: 12, color: '#888', marginTop: 2 },
+  sub: { fontSize: 12, color: 'var(--text-muted)', marginTop: 2 },
   disabled: { opacity: 0.4, cursor: 'not-allowed' },
-  empty: { padding: 32, textAlign: 'center', color: '#aaa' },
+  empty: { padding: 32, textAlign: 'center', color: 'var(--text-muted)' },
   clearRow: {
-    padding: '12px 16px', borderTop: '1px solid #eee',
+    padding: '12px 16px', borderTop: '1px solid var(--border)',
   },
   clearBtn: {
-    width: '100%', padding: '10px', background: '#f5f5f5',
+    width: '100%', padding: '10px', background: 'var(--page-bg)',
     border: 'none', borderRadius: 8, fontSize: 15, cursor: 'pointer',
-    color: '#555',
+    color: 'var(--text-sub)',
   },
 }
 
@@ -68,24 +70,12 @@ function getParts(member) {
 
 function filterByPart(members, selectedPart) {
   if (!selectedPart) return members
-  if (selectedPart === 'Vo') {
-    return members.filter(m => {
-      const parts = getParts(m)
-      return parts.includes('Vo') || parts.includes('ギタボ')
-    })
-  }
-  if (selectedPart === 'Gt') {
-    return members.filter(m => {
-      const parts = getParts(m)
-      return parts.includes('Gt') || parts.includes('ギタボ')
-    })
-  }
   return members.filter(m => getParts(m).includes(selectedPart))
 }
 
-export default function MemberSearchModal({ onSelect, onClose, disabledMemberIds = [], defaultPart = '' }) {
+export default function MemberSearchModal({ onSelect, onClose, disabledMemberIds = [], defaultPart = '', castFullMemberIds = null }) {
   const [search, setSearch] = useState('')
-  const [partFilter, setPartFilter] = useState(defaultPart || '')
+  const [partFilter, setPartFilter] = useState('')
   const [gradeFilter, setGradeFilter] = useState('')
   const [genderFilter, setGenderFilter] = useState('')
   const [members, setMembers] = useState([])
@@ -99,14 +89,18 @@ export default function MemberSearchModal({ onSelect, onClose, disabledMemberIds
   }, [])
 
   let filtered = members.filter(m => m.is_active !== false)
-  if (search) {
-    filtered = filtered.filter(m =>
-      m.full_name && m.full_name.includes(search)
-    )
-  }
-  filtered = filterByPart(filtered, partFilter)
+  if (search) filtered = filtered.filter(m => m.full_name && m.full_name.includes(search))
+  if (partFilter) filtered = filterByPart(filtered, partFilter)
   if (gradeFilter) filtered = filtered.filter(m => String(m.grade) === gradeFilter)
   if (genderFilter) filtered = filtered.filter(m => m.gender === genderFilter)
+
+  // defaultPartがある場合、一致するメンバーを上に、それ以外を下に分ける
+  const priorityMembers = defaultPart && !partFilter
+    ? filterByPart(filtered, defaultPart)
+    : filtered
+  const otherMembers = defaultPart && !partFilter
+    ? filtered.filter(m => !filterByPart([m], defaultPart).length)
+    : []
 
   return (
     <div style={s.overlay} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
@@ -140,33 +134,68 @@ export default function MemberSearchModal({ onSelect, onClose, disabledMemberIds
         </div>
         <div style={s.list}>
           {loading && <div style={s.empty}>読み込み中...</div>}
-          {!loading && filtered.length === 0 && <div style={s.empty}>該当するメンバーがいません</div>}
-          {!loading && filtered.map(m => {
-            const isDisabled = disabledMemberIds.includes(m.member_id)
-            return (
-              <div
-                key={m.member_id}
-                style={{ ...s.memberItem, ...(isDisabled ? s.disabled : {}) }}
-                onClick={() => !isDisabled && onSelect(m)}
-              >
-                {m.photo_url
-                  ? <img src={m.photo_url} alt={m.full_name} style={s.avatar} />
-                  : <div style={s.avatar}>👤</div>
-                }
-                <div style={s.info}>
-                  <div style={s.name}>{m.full_name}</div>
-                  <div style={s.sub}>
-                    {[
-                      m.main_part ? m.main_part.split(',').filter(Boolean).join('/') : null,
-                      m.grade ? `${m.grade}年` : null,
-                      m.gender,
-                    ].filter(Boolean).join(' / ')}
+          {!loading && priorityMembers.length === 0 && otherMembers.length === 0 && (
+            <div style={s.empty}>該当するメンバーがいません</div>
+          )}
+          {!loading && [...priorityMembers, ...otherMembers].length > 0 && (() => {
+            const renderItem = (m, dimmed = false) => {
+              const isDisabled = disabledMemberIds.includes(m.member_id)
+              const isCastFull = castFullMemberIds != null && castFullMemberIds.has(m.member_id)
+              return (
+                <div
+                  key={m.member_id}
+                  style={{
+                    ...s.memberItem,
+                    ...(isDisabled ? s.disabled : {}),
+                    opacity: dimmed ? 0.5 : (isCastFull ? 0.6 : 1),
+                  }}
+                  onClick={() => {
+                    if (isDisabled) return
+                    if (isCastFull) {
+                      alert(`${m.full_name} はこのライブの出演企画数が上限に達しているため選択できません`)
+                      return
+                    }
+                    onSelect(m)
+                  }}
+                >
+                  {m.photo_url
+                    ? <img src={m.photo_url} alt={m.full_name} style={s.avatar} />
+                    : <div style={s.avatar}>👤</div>
+                  }
+                  <div style={s.info}>
+                    <div style={s.name}>{m.full_name}</div>
+                    <div style={s.sub}>
+                      {[
+                        m.main_part ? m.main_part.split(',').filter(Boolean).join('/') : null,
+                        m.grade ? `${m.grade}年` : null,
+                        m.gender,
+                      ].filter(Boolean).join(' / ')}
+                    </div>
                   </div>
+                  {isDisabled && <span style={{ fontSize: 12, color: '#999' }}>選択済</span>}
+                  {isCastFull && (
+                    <span style={{
+                      fontSize: 11, color: '#dc2626', fontWeight: 700,
+                      background: '#fee2e2', padding: '2px 7px', borderRadius: 6,
+                    }}>上限</span>
+                  )}
                 </div>
-                {isDisabled && <span style={{ fontSize: 12, color: '#999' }}>選択済</span>}
-              </div>
+              )
+            }
+            return (
+              <>
+                {priorityMembers.map(m => renderItem(m, false))}
+                {otherMembers.length > 0 && (
+                  <>
+                    <div style={{ padding: '8px 16px', fontSize: 11, fontWeight: 700, color: '#94a3b8', background: '#f8fafc', letterSpacing: 0.5 }}>
+                      その他のメンバー
+                    </div>
+                    {otherMembers.map(m => renderItem(m, true))}
+                  </>
+                )}
+              </>
             )
-          })}
+          })()}
         </div>
         <div style={s.clearRow}>
           <button style={s.clearBtn} onClick={() => onSelect(null)}>空欄にする</button>

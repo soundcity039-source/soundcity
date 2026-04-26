@@ -6,9 +6,9 @@ const TYPES = ['バグ報告', '機能要望', '質問', 'その他']
 const TO = 'soundcity039@gmail.com'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -35,22 +35,22 @@ const s = {
   infoIcon: { fontSize: 20, flexShrink: 0, marginTop: 1 },
   infoText: {},
   card: {
-    background: '#fff', borderRadius: 16, padding: '20px 16px',
-    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
-  label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, letterSpacing: 0.3 },
+  label: { display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 6, letterSpacing: 0.3 },
   required: { color: '#ef4444', marginLeft: 4 },
   select: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
-    borderRadius: 10, fontSize: 15, background: '#f8fafc', boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
+    borderRadius: 10, fontSize: 15, background: 'var(--input-bg)', boxSizing: 'border-box',
     outline: 'none', appearance: 'none',
   },
   textarea: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
     borderRadius: 10, fontSize: 15, boxSizing: 'border-box',
     resize: 'vertical', minHeight: 150, fontFamily: 'inherit',
-    background: '#f8fafc', outline: 'none',
+    background: 'var(--input-bg)', outline: 'none',
   },
   fieldGroup: { marginBottom: 18 },
   sendBtn: {

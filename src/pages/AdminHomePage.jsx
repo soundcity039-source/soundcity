@@ -7,10 +7,12 @@ const menus = [
   { label: '出演費管理', icon: '💰', path: '/admin/fees', color: '#dcfce7', desc: '費用の集計・確認' },
   { label: 'メンバー管理', icon: '👥', path: '/admin/members',     color: '#ede9fe', desc: '在籍・役職の管理' },
   { label: 'ライブ動画管理', icon: '🎬', path: '/admin/live-videos', color: '#fce7f3', desc: '過去ライブ動画の編集' },
+  { label: '全応募一覧', icon: '📋', path: '/admin/applications', color: '#fef3c7', desc: '全企画の応募状況' },
+  { label: 'カレンダー編集', icon: '📆', path: '/admin/calendar', color: '#e0f2fe', desc: '合宿・イベントの管理' },
 ]
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', paddingBottom: 40 },
   header: {
     background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
     color: '#fff', padding: '28px 20px 72px',
@@ -42,7 +44,7 @@ const s = {
   greetingTitle: { fontSize: 24, fontWeight: 800, color: '#fff', marginTop: 4, letterSpacing: -0.5 },
   cardWrap: {
     margin: '-48px 16px 0',
-    background: '#fff',
+    background: 'var(--card-bg)',
     borderRadius: 20,
     boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
     padding: '8px 8px 16px',

@@ -10,7 +10,7 @@ function getYouTubeId(url) {
 const EMPTY = { live_name: '', day: 1, plan_name: '', youtube_url: '', display_order: '' }
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
     background: 'linear-gradient(135deg,#1e293b 0%,#0f172a 100%)',
     color: '#fff', padding: '16px 20px 20px',
@@ -26,37 +26,52 @@ const s = {
     width: 36, height: 36, borderRadius: '50%', fontSize: 18, cursor: 'pointer',
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative',
   },
-  headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
+  headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative', flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   addBtn: {
     width: '100%', padding: '12px', background: '#1e293b', color: '#fff',
     border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 16,
   },
-  // Group headers
-  groupHeader: {
-    fontSize: 13, fontWeight: 800, color: '#64748b',
-    padding: '6px 4px', marginBottom: 6, marginTop: 4,
-    display: 'flex', alignItems: 'center', gap: 6,
+  // Level cards
+  liveCard: {
+    background: 'var(--card-bg)', borderRadius: 14, marginBottom: 10,
+    boxShadow: 'var(--card-shadow)', overflow: 'hidden',
+    display: 'flex', alignItems: 'center', padding: '14px 16px',
+    cursor: 'pointer', border: '1px solid var(--card-border)', width: '100%', textAlign: 'left', gap: 12,
   },
-  // Card
+  liveCardTitle: { fontSize: 15, fontWeight: 800, color: 'var(--text)', flex: 1 },
+  liveCardSub: { fontSize: 12, color: 'var(--text-muted)', marginTop: 2 },
+  dayCard: {
+    background: 'var(--card-bg)', borderRadius: 14, marginBottom: 10,
+    boxShadow: 'var(--card-shadow)',
+    display: 'flex', alignItems: 'center', padding: '16px',
+    cursor: 'pointer', border: '1px solid var(--card-border)', width: '100%', textAlign: 'left', gap: 12,
+  },
+  dayBadge: {
+    width: 48, height: 48, borderRadius: 12, background: 'var(--primary)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 18, fontWeight: 800, color: '#fff', flexShrink: 0,
+  },
+  // Video card
   card: {
-    background: '#fff', borderRadius: 14, marginBottom: 8,
-    boxShadow: '0 1px 6px rgba(0,0,0,0.07)', overflow: 'hidden',
+    background: 'var(--card-bg)', borderRadius: 14, marginBottom: 8,
+    boxShadow: 'var(--card-shadow)', overflow: 'hidden',
     display: 'flex', alignItems: 'stretch',
+    border: '1px solid var(--card-border)',
   },
   thumbCol: { width: 80, flexShrink: 0, position: 'relative', background: '#0f172a' },
   thumbImg: { width: '100%', height: '100%', objectFit: 'cover' },
   cardBody: { padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4, justifyContent: 'center' },
-  planName: { fontSize: 14, fontWeight: 800, color: '#1e293b' },
-  urlText: { fontSize: 10, color: '#94a3b8', wordBreak: 'break-all' },
+  planName: { fontSize: 14, fontWeight: 800, color: 'var(--text)' },
+  urlText: { fontSize: 10, color: 'var(--text-muted)', wordBreak: 'break-all' },
   btnRow: { display: 'flex', gap: 6, marginTop: 4 },
   editBtn: {
-    padding: '5px 12px', background: '#eef2ff', border: 'none',
-    borderRadius: 6, color: '#4c51bf', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+    padding: '5px 12px', background: 'var(--primary-bg)', border: 'none',
+    borderRadius: 6, color: 'var(--primary-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer',
   },
   deleteBtn: {
-    padding: '5px 12px', background: '#fff5f5', border: '1px solid #fecaca',
-    borderRadius: 6, color: '#ef4444', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+    padding: '5px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+    borderRadius: 6, color: 'var(--danger)', fontWeight: 700, fontSize: 12, cursor: 'pointer',
   },
   // Modal
   overlay: {
@@ -64,46 +79,50 @@ const s = {
     display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1000,
   },
   modal: {
-    background: '#fff', borderRadius: '20px 20px 0 0', width: '100%',
+    background: 'var(--card-bg)', borderRadius: '20px 20px 0 0', width: '100%',
     maxWidth: 480, maxHeight: '92vh', overflowY: 'auto', padding: '20px 20px 40px',
+    color: 'var(--text)',
   },
-  modalHandle: { width: 40, height: 4, background: '#e2e8f0', borderRadius: 2, margin: '0 auto 16px' },
-  modalTitle: { fontSize: 17, fontWeight: 800, marginBottom: 20, color: '#1e293b' },
+  modalHandle: { width: 40, height: 4, background: 'var(--border)', borderRadius: 2, margin: '0 auto 16px' },
+  modalTitle: { fontSize: 17, fontWeight: 800, marginBottom: 20, color: 'var(--text)' },
   fieldGroup: { marginBottom: 14 },
-  label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 6 },
+  label: { display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-sub)', marginBottom: 6 },
   input: {
-    width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0',
-    borderRadius: 10, fontSize: 15, background: '#f8fafc', boxSizing: 'border-box',
+    width: '100%', padding: '10px 12px', border: '1.5px solid var(--border)',
+    borderRadius: 10, fontSize: 15, background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box',
   },
-  hint: { fontSize: 11, color: '#94a3b8', marginTop: 4 },
+  hint: { fontSize: 11, color: 'var(--text-muted)', marginTop: 4 },
   dayToggle: { display: 'flex', gap: 8 },
   dayBtn: {
-    flex: 1, padding: '10px 0', border: '1.5px solid #e2e8f0',
+    flex: 1, padding: '10px 0', border: '1.5px solid var(--border)',
     borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer',
-    background: '#fff', color: '#94a3b8', textAlign: 'center',
+    background: 'var(--input-bg)', color: 'var(--text-muted)', textAlign: 'center',
   },
-  dayBtnActive: { borderColor: '#1e293b', background: '#f8fafc', color: '#1e293b' },
+  dayBtnActive: { borderColor: 'var(--primary)', background: 'var(--primary-bg)', color: 'var(--primary-text)' },
   preview: { marginTop: 10, borderRadius: 8, overflow: 'hidden', background: '#000' },
   saveBtn: {
-    width: '100%', padding: '13px', background: 'linear-gradient(135deg,#1e293b,#0f172a)',
+    width: '100%', padding: '13px', background: 'var(--header-grad)',
     color: '#fff', border: 'none', borderRadius: 12,
     fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 8,
   },
   cancelBtn: {
-    width: '100%', padding: '11px', background: '#f1f5f9',
+    width: '100%', padding: '11px', background: 'var(--page-bg)',
     border: 'none', borderRadius: 12, fontSize: 15, cursor: 'pointer',
-    marginTop: 8, color: '#64748b', fontWeight: 600,
+    marginTop: 8, color: 'var(--text-sub)', fontWeight: 600,
   },
 }
 
 export default function LiveVideosManagePage() {
   const navigate = useNavigate()
-  const [videos, setVideos]     = useState([])
-  const [loading, setLoading]   = useState(true)
+  const [videos, setVideos]       = useState([])
+  const [loading, setLoading]     = useState(true)
+  const [view, setView]           = useState('lives')   // 'lives' | 'days' | 'videos'
+  const [selLive, setSelLive]     = useState(null)
+  const [selDay, setSelDay]       = useState(null)
   const [showModal, setShowModal] = useState(false)
-  const [editing, setEditing]   = useState(null)
-  const [form, setForm]         = useState(EMPTY)
-  const [saving, setSaving]     = useState(false)
+  const [editing, setEditing]     = useState(null)
+  const [form, setForm]           = useState(EMPTY)
+  const [saving, setSaving]       = useState(false)
 
   useEffect(() => {
     getLiveVideos()
@@ -112,28 +131,46 @@ export default function LiveVideosManagePage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const liveNames = [...new Set(videos.map(v => v.live_name))]
-
-  // ライブ名 × 日程でグループ化
-  function groupedVideos() {
-    const groups = []
-    for (const liveName of liveNames) {
-      const days = [...new Set(videos.filter(v => v.live_name === liveName).map(v => v.day))].sort()
-      for (const day of days) {
-        groups.push({
-          key: `${liveName}-${day}`,
-          liveName, day,
-          items: videos
-            .filter(v => v.live_name === liveName && v.day === day)
-            .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)),
-        })
-      }
-    }
-    return groups
+  function goBack() {
+    if (view === 'videos')     { setView('days');  setSelDay(null) }
+    else if (view === 'days')  { setView('lives'); setSelLive(null) }
+    else                       { navigate(-1) }
   }
 
+  // ユニークなライブ名一覧
+  const liveNames = [...new Set(
+    videos
+      .slice()
+      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+      .map(v => v.live_name)
+  )]
+
+  // 選択ライブの日程
+  const daysForLive = selLive
+    ? [...new Set(videos.filter(v => v.live_name === selLive).map(v => v.day))].sort()
+    : []
+
+  // 選択ライブ×日程の動画
+  const videosForDay = (selLive && selDay != null)
+    ? videos
+        .filter(v => v.live_name === selLive && v.day === selDay)
+        .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+    : []
+
+  const headerTitle = view === 'videos'
+    ? `${selLive} › ${selDay}日目`
+    : view === 'days'
+    ? selLive
+    : 'ライブ動画管理'
+
   function openAdd() {
-    setEditing(null); setForm(EMPTY); setShowModal(true)
+    setEditing(null)
+    setForm({
+      ...EMPTY,
+      live_name: selLive || '',
+      day: selDay ?? 1,
+    })
+    setShowModal(true)
   }
   function openEdit(v) {
     setEditing(v)
@@ -148,12 +185,22 @@ export default function LiveVideosManagePage() {
     if (!getYouTubeId(form.youtube_url)) { alert('YouTube URLの形式が正しくありません'); return }
     setSaving(true)
     try {
+      let displayOrder
+      if (form.display_order !== '') {
+        displayOrder = Number(form.display_order)
+      } else if (!editing) {
+        const sameGroup = videos.filter(v => v.live_name === form.live_name.trim() && v.day === Number(form.day))
+        const maxOrder = sameGroup.length > 0 ? Math.max(...sameGroup.map(v => v.display_order ?? 0)) : -1
+        displayOrder = maxOrder + 1
+      } else {
+        displayOrder = 0
+      }
       const payload = {
         live_name:     form.live_name.trim(),
         day:           Number(form.day),
         plan_name:     form.plan_name.trim(),
         youtube_url:   form.youtube_url.trim(),
-        display_order: form.display_order !== '' ? Number(form.display_order) : 0,
+        display_order: displayOrder,
       }
       if (editing) {
         const updated = await updateLiveVideo({ video_id: editing.video_id, ...payload })
@@ -180,39 +227,75 @@ export default function LiveVideosManagePage() {
     }
   }
 
-  const previewId = getYouTubeId(form.youtube_url)
-  const groups    = groupedVideos()
+  const previewId  = getYouTubeId(form.youtube_url)
 
   return (
     <div style={s.page}>
       <div style={s.header}>
         <div style={s.headerCircle}/>
-        <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
-        <span style={s.headerTitle}>ライブ動画管理</span>
+        <button style={s.backBtn} onClick={goBack}>←</button>
+        <span style={s.headerTitle}>{headerTitle}</span>
       </div>
 
       <div style={s.content}>
-        <button style={s.addBtn} onClick={openAdd}>＋ 動画を追加</button>
-
         {loading && <div style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>読み込み中...</div>}
-        {!loading && videos.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>動画が登録されていません</div>
+
+        {/* ── Level 1: ライブ一覧 ── */}
+        {!loading && view === 'lives' && (
+          <>
+            <button style={s.addBtn} onClick={openAdd}>＋ 動画を追加</button>
+            {liveNames.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>動画が登録されていません</div>
+            )}
+            {liveNames.map(liveName => {
+              const liveVids = videos.filter(v => v.live_name === liveName)
+              const days  = [...new Set(liveVids.map(v => v.day))].sort()
+              const total = liveVids.length
+              return (
+                <button key={liveName} style={s.liveCard}
+                  onClick={() => { setSelLive(liveName); setView('days') }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={s.liveCardTitle}>{liveName}</div>
+                    <div style={s.liveCardSub}>
+                      {days.map(d => `${d}日目`).join(' / ')} · {total}企画
+                    </div>
+                  </div>
+                  <span style={{ color: '#cbd5e1', fontSize: 18 }}>›</span>
+                </button>
+              )
+            })}
+          </>
         )}
 
-        {/* グループ表示 */}
-        {!loading && groups.map(group => (
-          <div key={group.key}>
-            <div style={s.groupHeader}>
-              <span style={{
-                background: '#1e293b', color: '#fff',
-                padding: '2px 10px', borderRadius: 6, fontSize: 12,
-              }}>{group.liveName}</span>
-              <span style={{
-                background: '#e2e8f0', color: '#64748b',
-                padding: '2px 8px', borderRadius: 6, fontSize: 12,
-              }}>{group.day}日目</span>
-            </div>
-            {group.items.map(v => {
+        {/* ── Level 2: 日程選択 ── */}
+        {!loading && view === 'days' && (
+          <>
+            <button style={s.addBtn} onClick={openAdd}>＋ 動画を追加</button>
+            {daysForLive.map(day => {
+              const cnt = videos.filter(v => v.live_name === selLive && v.day === day).length
+              return (
+                <button key={day} style={s.dayCard}
+                  onClick={() => { setSelDay(day); setView('videos') }}>
+                  <div style={s.dayBadge}>{day}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#1e293b' }}>{day}日目</div>
+                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{cnt}企画</div>
+                  </div>
+                  <span style={{ color: '#cbd5e1', fontSize: 18 }}>›</span>
+                </button>
+              )
+            })}
+          </>
+        )}
+
+        {/* ── Level 3: 動画一覧 ── */}
+        {!loading && view === 'videos' && (
+          <>
+            <button style={s.addBtn} onClick={openAdd}>＋ 動画を追加</button>
+            {videosForDay.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#aaa', padding: 40 }}>動画がありません</div>
+            )}
+            {videosForDay.map(v => {
               const vid = getYouTubeId(v.youtube_url)
               return (
                 <div key={v.video_id} style={s.card}>
@@ -233,8 +316,8 @@ export default function LiveVideosManagePage() {
                 </div>
               )
             })}
-          </div>
-        ))}
+          </>
+        )}
       </div>
 
       {showModal && (
@@ -243,7 +326,6 @@ export default function LiveVideosManagePage() {
             <div style={s.modalHandle}/>
             <div style={s.modalTitle}>{editing ? '動画を編集' : '動画を追加'}</div>
 
-            {/* ライブ名 */}
             <div style={s.fieldGroup}>
               <label style={s.label}>ライブ名 *</label>
               <input
@@ -256,7 +338,6 @@ export default function LiveVideosManagePage() {
               </datalist>
             </div>
 
-            {/* 日程 */}
             <div style={s.fieldGroup}>
               <label style={s.label}>日程 *</label>
               <div style={s.dayToggle}>
@@ -270,7 +351,6 @@ export default function LiveVideosManagePage() {
               </div>
             </div>
 
-            {/* 企画名 */}
             <div style={s.fieldGroup}>
               <label style={s.label}>企画名（バンド名） *</label>
               <input
@@ -280,7 +360,6 @@ export default function LiveVideosManagePage() {
               />
             </div>
 
-            {/* YouTube URL */}
             <div style={s.fieldGroup}>
               <label style={s.label}>YouTube URL *</label>
               <input
@@ -303,11 +382,10 @@ export default function LiveVideosManagePage() {
               )}
             </div>
 
-            {/* 表示順 */}
             <div style={s.fieldGroup}>
               <label style={s.label}>表示順（小さい数が上）</label>
               <input
-                style={s.input} type="number" placeholder="0"
+                style={s.input} type="number" placeholder="空欄で自動（末尾）"
                 value={form.display_order}
                 onChange={e => setForm(f => ({ ...f, display_order: e.target.value }))}
               />

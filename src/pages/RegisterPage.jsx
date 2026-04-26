@@ -4,15 +4,15 @@ import { registerMember } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
 import { supabase } from '../lib/supabase.js'
 
-const MAIN_PARTS = ['Vo', 'ギタボ', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'Sax', 'その他']
-const WANT_PARTS_OPTIONS = ['Vo', 'ギタボ', 'Gt', 'Gt2', 'Ba', 'Dr', 'Key', 'Key2', 'DJ', 'コーラス', 'Sax', 'その他']
+const MAIN_PARTS = ['Vo', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'Sax', 'その他']
+const WANT_PARTS_OPTIONS = ['Vo', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'コーラス', 'Sax', 'その他']
 const GRADES = [1, 2, 3, 4]
 const GENDERS = ['男', '女', 'その他']
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '28px 20px 20px',
     position: 'relative', overflow: 'hidden',
   },
@@ -30,34 +30,34 @@ const s = {
   },
   form: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   card: {
-    background: '#fff', borderRadius: 16, padding: '20px 16px',
-    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
-  label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, letterSpacing: 0.3 },
+  label: { display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 6, letterSpacing: 0.3 },
   required: { color: '#ef4444', marginLeft: 4 },
   input: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
     borderRadius: 10, fontSize: 15, boxSizing: 'border-box',
-    background: '#f8fafc', outline: 'none',
+    background: 'var(--input-bg)', outline: 'none',
   },
   select: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
-    borderRadius: 10, fontSize: 15, background: '#f8fafc', boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
+    borderRadius: 10, fontSize: 15, background: 'var(--input-bg)', boxSizing: 'border-box',
     outline: 'none', appearance: 'none',
   },
   checkboxGroup: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 },
   checkboxLabel: {
     display: 'flex', alignItems: 'center',
-    padding: '7px 14px', border: '1.5px solid #e2e8f0', borderRadius: 20,
+    padding: '7px 14px', border: '1.5px solid var(--border)', borderRadius: 20,
     fontSize: 13, fontWeight: 500, cursor: 'pointer', userSelect: 'none',
-    background: '#f8fafc', color: '#64748b',
+    background: 'var(--input-bg)', color: 'var(--text-sub)',
   },
   checkboxLabelActive: { borderColor: '#06C755', background: '#dcfce7', color: '#166534', fontWeight: 700 },
   fieldGroup: { marginBottom: 18 },
   submitBtn: {
     width: '100%', padding: '15px',
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
     color: '#fff', border: 'none', borderRadius: 12,
     fontSize: 16, fontWeight: 800, cursor: 'pointer', marginTop: 4,
     boxShadow: '0 4px 16px rgba(6,199,85,0.3)',

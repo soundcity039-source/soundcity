@@ -1,0 +1,26 @@
+{
+  "name": "SoundCityツール",
+  "short_name": "SoundCity",
+  "description": "軽音サークルのライブ応募・メンバー管理・練習室予約",
+  "start_url": "/soundcity/",
+  "scope": "/soundcity/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#06C755",
+  "orientation": "portrait-primary",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/soundcity/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/soundcity/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

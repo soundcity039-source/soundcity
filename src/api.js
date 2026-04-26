@@ -26,6 +26,10 @@ export async function registerMember(payload) {
     fav_bands: payload.fav_bands || null,
     want_parts: Array.isArray(payload.want_parts)
       ? payload.want_parts.join(',') : (payload.want_parts || null),
+    birthday: payload.birthday || null,
+    recent_hobby: payload.recent_hobby || null,
+    faculty_dept: payload.faculty_dept || null,
+    line_id: payload.line_id || null,
   }
   const { data, error } = await supabase.from('members').insert(row).select().single()
   if (error) throw error
@@ -43,6 +47,10 @@ export async function updateProfile(payload) {
     fav_bands: payload.fav_bands || null,
     want_parts: Array.isArray(payload.want_parts)
       ? payload.want_parts.join(',') : (payload.want_parts || null),
+    birthday: payload.birthday || null,
+    recent_hobby: payload.recent_hobby || null,
+    faculty_dept: payload.faculty_dept || null,
+    line_id: payload.line_id || null,
   }
   const { data, error } = await supabase
     .from('members').update(row).eq('member_id', payload.member_id).select().single()
@@ -92,7 +100,9 @@ export async function updateLive(payload) {
 export async function getPlans(filters = {}) {
   let query = supabase.from('plans').select(`
     *,
-    casts(*, member:members(*))
+    casts(*, member:members(*)),
+    leader:members!leader_id(member_id, full_name, photo_url),
+    live:lives(live_name, date1)
   `)
   if (filters.live_id) query = query.eq('live_id', filters.live_id)
   if (filters.leader_id) query = query.eq('leader_id', filters.leader_id)
@@ -101,9 +111,38 @@ export async function getPlans(filters = {}) {
   return data || []
 }
 
-export async function createPlan({ live_id, band_name, song_count, leader_id, casts: castsData }) {
+// 自分が代表またはキャストとして参加している企画を取得
+export async function getMyPlans(memberId) {
+  const PLAN_SELECT = `*, casts(*, member:members(*)), leader:members!leader_id(member_id, full_name, photo_url), live:lives(live_name, date1)`
+  const { data: leaderPlans, error: e1 } = await supabase
+    .from('plans').select(PLAN_SELECT)
+    .eq('leader_id', memberId)
+    .order('applied_at', { ascending: false })
+  if (e1) throw e1
+
+  const { data: castRows, error: e2 } = await supabase
+    .from('casts').select('plan_id').eq('member_id', memberId)
+  if (e2) throw e2
+
+  const leaderIds = new Set((leaderPlans || []).map(p => p.plan_id))
+  const castPlanIds = (castRows || []).map(c => c.plan_id).filter(id => !leaderIds.has(id))
+
+  let castPlans = []
+  if (castPlanIds.length > 0) {
+    const { data, error: e3 } = await supabase
+      .from('plans').select(PLAN_SELECT)
+      .in('plan_id', castPlanIds)
+      .order('applied_at', { ascending: false })
+    if (e3) throw e3
+    castPlans = data || []
+  }
+
+  return [...(leaderPlans || []), ...castPlans]
+}
+
+export async function createPlan({ live_id, band_name, song_count, leader_id, casts: castsData, mic_note, sound_note, se_note, light_note }) {
   const { data: plan, error } = await supabase
-    .from('plans').insert({ live_id, band_name, song_count, leader_id }).select().single()
+    .from('plans').insert({ live_id, band_name, song_count, leader_id, mic_note: mic_note || null, sound_note: sound_note || null, se_note: se_note || null, light_note: light_note || null }).select().single()
   if (error) throw error
   if (castsData?.length) {
     const rows = castsData.map(c => ({ plan_id: plan.plan_id, part: c.part, member_id: c.member_id || null }))
@@ -113,9 +152,9 @@ export async function createPlan({ live_id, band_name, song_count, leader_id, ca
   return plan
 }
 
-export async function updatePlan({ plan_id, live_id, band_name, song_count, leader_id, casts: castsData }) {
+export async function updatePlan({ plan_id, live_id, band_name, song_count, leader_id, casts: castsData, mic_note, sound_note, se_note, light_note }) {
   const { error } = await supabase
-    .from('plans').update({ live_id, band_name, song_count, leader_id }).eq('plan_id', plan_id)
+    .from('plans').update({ live_id, band_name, song_count, leader_id, mic_note: mic_note || null, sound_note: sound_note || null, se_note: se_note || null, light_note: light_note || null }).eq('plan_id', plan_id)
   if (error) throw error
   await supabase.from('casts').delete().eq('plan_id', plan_id)
   if (castsData?.length) {
@@ -128,6 +167,23 @@ export async function updatePlan({ plan_id, live_id, band_name, song_count, lead
 export async function deletePlan({ plan_id }) {
   const { error } = await supabase.from('plans').delete().eq('plan_id', plan_id)
   if (error) throw error
+}
+
+// ライブ内のメンバーごとの出演企画数を返す { member_id: count }
+export async function getCastCountsByMember(liveId) {
+  const { data: plans, error } = await supabase
+    .from('plans').select('plan_id').eq('live_id', liveId)
+  if (error) throw error
+  if (!plans?.length) return {}
+  const planIds = plans.map(p => p.plan_id)
+  const { data: casts, error: e2 } = await supabase
+    .from('casts').select('member_id').in('plan_id', planIds).not('member_id', 'is', null)
+  if (e2) throw e2
+  const counts = {}
+  for (const c of casts || []) {
+    if (c.member_id) counts[c.member_id] = (counts[c.member_id] || 0) + 1
+  }
+  return counts
 }
 
 // ---------------------------------------------------------------------------
@@ -172,6 +228,14 @@ export async function getTemplates(creatorId) {
 }
 
 export async function createTemplate({ band_name, creator_id, casts: castsData }) {
+  // 同じバンド名 + 作成者のテンプレがあれば先に削除（重複防止）
+  const { data: existing } = await supabase
+    .from('templates').select('template_id').eq('band_name', band_name).eq('creator_id', creator_id)
+  if (existing?.length) {
+    const ids = existing.map(t => t.template_id)
+    await supabase.from('template_casts').delete().in('template_id', ids)
+    await supabase.from('templates').delete().in('template_id', ids)
+  }
   const { data: tmpl, error } = await supabase
     .from('templates').insert({ band_name, creator_id }).select().single()
   if (error) throw error
@@ -230,6 +294,36 @@ export async function deleteLiveVideo(videoId) {
 }
 
 // ---------------------------------------------------------------------------
+// Calendar Events
+// ---------------------------------------------------------------------------
+export async function getCalendarEvents() {
+  const { data, error } = await supabase
+    .from('calendar_events').select('*').order('date_start')
+  if (error) throw error
+  return data || []
+}
+
+export async function createCalendarEvent(payload) {
+  const { data, error } = await supabase
+    .from('calendar_events').insert(payload).select()
+  if (error) throw error
+  return (data && data[0]) || { ...payload }
+}
+
+export async function updateCalendarEvent({ event_id, ...fields }) {
+  const { data, error } = await supabase
+    .from('calendar_events').update(fields).eq('event_id', event_id).select()
+  if (error) throw error
+  return (data && data[0]) || { event_id, ...fields }
+}
+
+export async function deleteCalendarEvent(eventId) {
+  const { error } = await supabase
+    .from('calendar_events').delete().eq('event_id', eventId)
+  if (error) throw error
+}
+
+// ---------------------------------------------------------------------------
 // Room Reservations
 // ---------------------------------------------------------------------------
 export async function getRoomReservations(year, month) {
@@ -258,6 +352,28 @@ export async function deleteRoomReservation(reservationId) {
   const { error } = await supabase
     .from('room_reservations').delete().eq('reservation_id', reservationId)
   if (error) throw error
+}
+
+// ---------------------------------------------------------------------------
+// Fee Collections
+// ---------------------------------------------------------------------------
+export async function getFeeCollections(liveId) {
+  const { data, error } = await supabase
+    .from('fee_collections').select('member_id').eq('live_id', liveId)
+  if (error) throw error
+  return data || []
+}
+
+export async function setFeeCollection(liveId, memberId, collected) {
+  if (collected) {
+    const { error } = await supabase
+      .from('fee_collections').upsert({ live_id: liveId, member_id: memberId })
+    if (error) throw error
+  } else {
+    const { error } = await supabase
+      .from('fee_collections').delete().eq('live_id', liveId).eq('member_id', memberId)
+    if (error) throw error
+  }
 }
 
 // ---------------------------------------------------------------------------

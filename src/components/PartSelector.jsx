@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import MemberSearchModal from './MemberSearchModal.jsx'
 
+const VO_OPTIONS = ['Vo', 'Vo/Gt', 'Vo/Ba', 'Vo/Key', 'Vo/Dr']
+
 const s = {
   row: {
     display: 'flex', alignItems: 'center', gap: 8,
@@ -8,6 +10,12 @@ const s = {
   },
   partLabel: {
     minWidth: 72, fontWeight: 600, fontSize: 14, color: '#333',
+  },
+  partSelect: {
+    minWidth: 80, fontWeight: 600, fontSize: 13,
+    border: '1.5px solid var(--border)', borderRadius: 8,
+    padding: '5px 4px', background: 'var(--input-bg)', color: 'var(--text)',
+    cursor: 'pointer', outline: 'none', flexShrink: 0,
   },
   memberBtn: {
     flex: 1, padding: '8px 12px', border: '1px solid #ddd',
@@ -26,13 +34,24 @@ const s = {
   },
 }
 
-export default function PartSelector({ part, member, onMemberChange, onRemove, disabledMemberIds }) {
+export default function PartSelector({ part, member, onMemberChange, onRemove, disabledMemberIds, onPartChange, castFullMemberIds }) {
   const [showModal, setShowModal] = useState(false)
+  const isVo = part === 'Vo' || part.startsWith('Vo/')
 
   return (
     <>
       <div style={s.row}>
-        <span style={s.partLabel}>{part}</span>
+        {isVo && onPartChange ? (
+          <select
+            style={s.partSelect}
+            value={part}
+            onChange={e => onPartChange(e.target.value)}
+          >
+            {VO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+          </select>
+        ) : (
+          <span style={s.partLabel}>{part}</span>
+        )}
         <button style={s.memberBtn} onClick={() => setShowModal(true)}>
           {member
             ? <>
@@ -51,6 +70,7 @@ export default function PartSelector({ part, member, onMemberChange, onRemove, d
         <MemberSearchModal
           defaultPart={part}
           disabledMemberIds={disabledMemberIds}
+          castFullMemberIds={castFullMemberIds}
           onSelect={m => { onMemberChange(m); setShowModal(false) }}
           onClose={() => setShowModal(false)}
         />

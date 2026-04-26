@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -39,17 +39,17 @@ const s = {
   liveLabel: { fontSize: 11, color: '#166534', fontWeight: 700, letterSpacing: 0.5, marginBottom: 2 },
   liveName: { fontWeight: 800, color: '#14532d', fontSize: 15 },
   card: {
-    background: '#fff', borderRadius: 16, padding: '20px 16px',
-    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
   fieldGroup: { marginBottom: 18 },
-  label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, letterSpacing: 0.3 },
+  label: { display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 6, letterSpacing: 0.3 },
   required: { color: '#ef4444', marginLeft: 4 },
   input: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
     borderRadius: 10, fontSize: 15, boxSizing: 'border-box',
-    background: '#f8fafc', outline: 'none',
+    background: 'var(--input-bg)', outline: 'none',
   },
   error: { color: '#ef4444', fontSize: 12, marginTop: 5, fontWeight: 500 },
   templateBtn: {
@@ -59,7 +59,7 @@ const s = {
   },
   nextBtn: {
     width: '100%', padding: '15px',
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
     color: '#fff', border: 'none', borderRadius: 12,
     fontSize: 16, fontWeight: 800, cursor: 'pointer',
     boxShadow: '0 4px 16px rgba(6,199,85,0.3)',

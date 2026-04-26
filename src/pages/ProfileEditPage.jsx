@@ -3,15 +3,28 @@ import { useNavigate } from 'react-router-dom'
 import { updateProfile } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
 import PhotoUpload from '../components/PhotoUpload.jsx'
-const MAIN_PARTS = ['Vo', 'ギタボ', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'Sax', 'その他']
-const WANT_PARTS_OPTIONS = ['Vo', 'ギタボ', 'Gt', 'Gt2', 'Ba', 'Dr', 'Key', 'Key2', 'DJ', 'コーラス', 'Sax', 'その他']
+const MAIN_PARTS = ['Vo', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'Sax', 'その他']
+const WANT_PARTS_OPTIONS = ['Vo', 'Gt', 'Ba', 'Dr', 'Key', 'DJ', 'コーラス', 'Sax', 'その他']
 const GRADES = [1, 2, 3, 4]
 const GENDERS = ['男', '女', 'その他']
 
+const MEIJI_FACULTIES = [
+  { faculty: '法学部',               depts: ['法律学科'] },
+  { faculty: '商学部',               depts: ['商学科'] },
+  { faculty: '政治経済学部',          depts: ['政治学科', '経済学科', '地域行政学科'] },
+  { faculty: '文学部',               depts: ['文学科', '史学地理学科', '心理社会学科'] },
+  { faculty: '理工学部',             depts: ['電気電子生命学科', '機械情報工学科', '機械工学科', '建築学科', '応用化学科', '情報科学科', '数学科', '物理学科'] },
+  { faculty: '農学部',               depts: ['農学科', '農芸化学科', '生命科学科', '食料環境政策学科'] },
+  { faculty: '経営学部',             depts: ['経営学科', '会計学科', '公共経営学科'] },
+  { faculty: '情報コミュニケーション学部', depts: ['情報コミュニケーション学科'] },
+  { faculty: '国際日本学部',          depts: ['国際日本学科'] },
+  { faculty: '総合数理学部',          depts: ['現象数理学科', '先端メディアサイエンス学科', 'ネットワークデザイン学科'] },
+]
+
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -30,39 +43,39 @@ const s = {
   headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
   form: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   card: {
-    background: '#fff', borderRadius: 16, padding: '20px 16px',
-    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
   cardTitle: {
     fontSize: 13, fontWeight: 800, color: '#475569',
     marginBottom: 16, letterSpacing: 0.3,
   },
-  label: { display: 'block', fontSize: 12, fontWeight: 700, color: '#64748b', marginBottom: 6, letterSpacing: 0.3 },
+  label: { display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-sub)', marginBottom: 6, letterSpacing: 0.3 },
   required: { color: '#ef4444', marginLeft: 4 },
   input: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
     borderRadius: 10, fontSize: 15, boxSizing: 'border-box',
-    background: '#f8fafc', outline: 'none',
+    background: 'var(--input-bg)', outline: 'none',
     transition: 'border-color 0.15s',
   },
   select: {
-    width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0',
-    borderRadius: 10, fontSize: 15, background: '#f8fafc', boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', border: '1.5px solid var(--border)',
+    borderRadius: 10, fontSize: 15, background: 'var(--input-bg)', boxSizing: 'border-box',
     outline: 'none', appearance: 'none',
   },
   checkboxGroup: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 6 },
   checkboxLabel: {
     display: 'flex', alignItems: 'center',
-    padding: '7px 14px', border: '1.5px solid #e2e8f0', borderRadius: 20,
+    padding: '7px 14px', border: '1.5px solid var(--border)', borderRadius: 20,
     fontSize: 13, fontWeight: 500, cursor: 'pointer', userSelect: 'none',
-    background: '#f8fafc', color: '#64748b',
+    background: 'var(--input-bg)', color: 'var(--text-sub)',
     transition: 'all 0.12s',
   },
   checkboxLabelActive: { borderColor: '#06C755', background: '#dcfce7', color: '#166534', fontWeight: 700 },
   fieldGroup: { marginBottom: 18 },
   submitBtn: {
-    width: '100%', padding: '15px', background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    width: '100%', padding: '15px', background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
     color: '#fff', border: 'none', borderRadius: 12,
     fontSize: 16, fontWeight: 800, cursor: 'pointer',
     boxShadow: '0 4px 16px rgba(6,199,85,0.3)',
@@ -99,6 +112,10 @@ export default function ProfileEditPage() {
     main_part: initialMainParts,
     fav_bands: currentUser?.fav_bands || '',
     want_parts: initialWantParts,
+    birthday: currentUser?.birthday || '',
+    faculty_dept: currentUser?.faculty_dept || '',
+    recent_hobby: currentUser?.recent_hobby || '',
+    line_id: currentUser?.line_id || '',
   })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -190,6 +207,30 @@ export default function ProfileEditPage() {
           </div>
 
           <div style={s.fieldGroup}>
+            <label style={s.label}>学部・学科</label>
+            <select style={s.select} value={formData.faculty_dept} onChange={e => handleChange('faculty_dept', e.target.value)}>
+              <option value="">選択してください</option>
+              {MEIJI_FACULTIES.map(f => (
+                <optgroup key={f.faculty} label={f.faculty}>
+                  {f.depts.map(d => (
+                    <option key={d} value={`${f.faculty} ${d}`}>{d}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+
+          <div style={s.fieldGroup}>
+            <label style={s.label}>誕生日</label>
+            <input
+              type="date"
+              style={s.input}
+              value={formData.birthday}
+              onChange={e => handleChange('birthday', e.target.value)}
+            />
+          </div>
+
+          <div style={s.fieldGroup}>
             <label style={s.label}>性別</label>
             <select style={s.select} value={formData.gender} onChange={e => handleChange('gender', e.target.value)}>
               <option value="">選択してください</option>
@@ -220,6 +261,30 @@ export default function ProfileEditPage() {
               value={formData.fav_bands}
               onChange={e => handleChange('fav_bands', e.target.value)}
             />
+          </div>
+
+          <div style={s.fieldGroup}>
+            <label style={s.label}>最近ハマっていること</label>
+            <input
+              style={s.input}
+              placeholder="例：カフェ巡り、アニメ鑑賞など"
+              value={formData.recent_hobby}
+              onChange={e => handleChange('recent_hobby', e.target.value)}
+            />
+          </div>
+
+          <div style={s.fieldGroup}>
+            <label style={s.label}>LINE ID</label>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18 }}>💬</span>
+              <input
+                style={{ ...s.input, paddingLeft: 38 }}
+                placeholder="例：taro_yamada（IDのみ入力）"
+                value={formData.line_id}
+                onChange={e => handleChange('line_id', e.target.value)}
+              />
+            </div>
+            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>LINEアプリ → プロフィール → ID で確認できます</div>
           </div>
 
           <div style={s.fieldGroup}>

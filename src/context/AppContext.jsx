@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { applyTheme, DEFAULT_THEME } from '../theme.js'
 
 const AppContext = createContext(null)
 
@@ -12,10 +13,26 @@ export function AppProvider({ children }) {
     parts: [],
     save_as_template: false,
     editing_plan_id: null,
+    mic_note: '',
+    sound_note: '',
+    se_note: '',
+    light_note: '',
+  })
+  const [themeId, setThemeId] = useState(() => {
+    return localStorage.getItem('sc_theme') || DEFAULT_THEME
   })
 
+  useEffect(() => {
+    applyTheme(themeId)
+  }, [themeId])
+
+  function changeTheme(id) {
+    setThemeId(id)
+    localStorage.setItem('sc_theme', id)
+  }
+
   return (
-    <AppContext.Provider value={{ currentUser, setCurrentUser, formState, setFormState }}>
+    <AppContext.Provider value={{ currentUser, setCurrentUser, formState, setFormState, themeId, changeTheme }}>
       {children}
     </AppContext.Provider>
   )

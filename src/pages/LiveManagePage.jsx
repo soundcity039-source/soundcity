@@ -4,9 +4,9 @@ import { getLives, createLive, updateLive } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -29,8 +29,8 @@ const s = {
     border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 16,
   },
   card: {
-    background: '#fff', borderRadius: 12, padding: '16px',
-    marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+    background: 'var(--card-bg)', borderRadius: 12, padding: '16px',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)', border: '1px solid var(--card-border)',
   },
   liveName: { fontSize: 16, fontWeight: 700, marginBottom: 6 },
   meta: { fontSize: 13, color: '#666', marginBottom: 4 },
@@ -50,19 +50,19 @@ const s = {
     display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 1000,
   },
   modalBox: {
-    background: '#fff', borderRadius: '16px 16px 0 0', width: '100%',
+    background: 'var(--card-bg)', borderRadius: '16px 16px 0 0', width: '100%',
     maxWidth: 480, maxHeight: '90vh', overflowY: 'auto', padding: '20px 16px 32px',
   },
   modalTitle: { fontSize: 18, fontWeight: 700, marginBottom: 20 },
   fieldGroup: { marginBottom: 14 },
   label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#555', marginBottom: 6 },
   input: {
-    width: '100%', padding: '10px 12px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 15, boxSizing: 'border-box',
+    width: '100%', padding: '10px 12px', border: '1px solid var(--border)',
+    borderRadius: 8, fontSize: 15, boxSizing: 'border-box', background: 'var(--input-bg)',
   },
   select: {
-    width: '100%', padding: '10px 12px', border: '1px solid #ddd',
-    borderRadius: 8, fontSize: 15, background: '#fff', boxSizing: 'border-box',
+    width: '100%', padding: '10px 12px', border: '1px solid var(--border)',
+    borderRadius: 8, fontSize: 15, background: 'var(--card-bg)', boxSizing: 'border-box',
   },
   feeGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 },
   saveBtn: {
@@ -82,6 +82,7 @@ const EMPTY_FORM = {
   live_name: '', date1: '', date2: '', deadline: '',
   fee_mode: 'flat', fee_flat: '', fee_1plan: '', fee_2plan: '', fee_3plan: '',
   status: 'open',
+  max_cast_plans: '', max_leader_plans: '',
 }
 
 function formatDateForInput(dateStr) {
@@ -130,6 +131,8 @@ export default function LiveManagePage() {
       fee_2plan: live.fee_2plan != null ? String(live.fee_2plan) : '',
       fee_3plan: live.fee_3plan != null ? String(live.fee_3plan) : '',
       status: live.status || 'open',
+      max_cast_plans: live.max_cast_plans != null ? String(live.max_cast_plans) : '',
+      max_leader_plans: live.max_leader_plans != null ? String(live.max_leader_plans) : '',
     })
     setShowModal(true)
   }
@@ -152,6 +155,8 @@ export default function LiveManagePage() {
         fee_1plan: form.fee_1plan ? Number(form.fee_1plan) : null,
         fee_2plan: form.fee_2plan ? Number(form.fee_2plan) : null,
         fee_3plan: form.fee_3plan ? Number(form.fee_3plan) : null,
+        max_cast_plans: form.max_cast_plans ? Number(form.max_cast_plans) : null,
+        max_leader_plans: form.max_leader_plans ? Number(form.max_leader_plans) : null,
       }
       if (editingLive) {
         const result = await updateLive({ ...payload, live_id: editingLive.live_id })
@@ -254,6 +259,19 @@ export default function LiveManagePage() {
                 </div>
               </div>
             )}
+
+            <div style={s.fieldGroup}>
+              <label style={s.label}>出演企画数の上限（空欄＝無制限）</label>
+              <input style={s.input} type="number" min="1" placeholder="例：2"
+                value={form.max_cast_plans} onChange={e => handleFormChange('max_cast_plans', e.target.value)} />
+              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>1人が出演できる企画数の上限（キャストとして含まれる企画の合計）</div>
+            </div>
+            <div style={s.fieldGroup}>
+              <label style={s.label}>代表者応募数の上限（空欄＝無制限）</label>
+              <input style={s.input} type="number" min="1" placeholder="例：1"
+                value={form.max_leader_plans} onChange={e => handleFormChange('max_leader_plans', e.target.value)} />
+              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>1人が代表者として応募できる企画数の上限</div>
+            </div>
 
             <button style={s.saveBtn} onClick={handleSave} disabled={saving}>
               {saving ? '保存中...' : '保存する'}

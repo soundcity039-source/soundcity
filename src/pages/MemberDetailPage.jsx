@@ -9,12 +9,13 @@ const ROLE_COLORS = {
   'ライブ係': { bg: '#ede9fe', color: '#5b21b6' },
   'PA':      { bg: '#f0fdf4', color: '#166534' },
   '新歓係':  { bg: '#fff7ed', color: '#9a3412' },
+  '合宿係':  { bg: '#e0f2fe', color: '#0369a1' },
 }
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
   },
@@ -25,7 +26,7 @@ const s = {
   },
   headerTitle: { fontSize: 17, fontWeight: 700 },
   profileHero: {
-    background: 'linear-gradient(160deg, #6366f1 0%, #4f46e5 60%, #818cf8 100%)',
+    background: 'var(--header-grad)',
     padding: '32px 20px 28px',
     display: 'flex', flexDirection: 'column', alignItems: 'center',
     position: 'relative', overflow: 'hidden',
@@ -59,9 +60,9 @@ const s = {
   },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   card: {
-    background: '#fff', borderRadius: 16, overflow: 'hidden',
-    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, overflow: 'hidden',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
   cardTitle: {
     padding: '14px 16px', fontSize: 13, fontWeight: 800, color: '#1e293b',
@@ -72,8 +73,8 @@ const s = {
     display: 'flex', alignItems: 'center',
     padding: '12px 16px', borderBottom: '1px solid #f8fafc',
   },
-  rowLabel: { minWidth: 110, fontSize: 12, color: '#94a3b8', fontWeight: 600, letterSpacing: 0.3 },
-  rowValue: { fontSize: 14, color: '#334155', flex: 1, fontWeight: 500 },
+  rowLabel: { minWidth: 110, fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.3 },
+  rowValue: { fontSize: 14, color: 'var(--text)', flex: 1, fontWeight: 500 },
   historyItem: {
     padding: '14px 16px', borderBottom: '1px solid #f8fafc',
     display: 'flex', flexDirection: 'column', gap: 4,
@@ -81,14 +82,14 @@ const s = {
   historyMeta: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 },
   historyLive: { fontSize: 11, color: '#94a3b8', fontWeight: 600 },
   historyDate: { fontSize: 11, color: '#94a3b8' },
-  historyBand: { fontSize: 15, fontWeight: 700, color: '#1e293b' },
+  historyBand: { fontSize: 15, fontWeight: 700, color: 'var(--text)' },
   historyPart: {
     display: 'inline-block', padding: '3px 10px',
     background: '#ede9fe', borderRadius: 8,
     fontSize: 11, color: '#5b21b6', fontWeight: 700,
     alignSelf: 'flex-start', marginTop: 2,
   },
-  empty: { padding: '20px', fontSize: 13, color: '#94a3b8', textAlign: 'center' },
+  empty: { padding: '20px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' },
   loading: { textAlign: 'center', color: '#94a3b8', padding: 40 },
   notFound: { textAlign: 'center', color: '#94a3b8', padding: 40 },
 }
@@ -99,6 +100,7 @@ export default function MemberDetailPage() {
   const [member, setMember] = useState(null)
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(true)
+  const [photoFull, setPhotoFull] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -122,6 +124,15 @@ export default function MemberDetailPage() {
 
   return (
     <div style={s.page}>
+      {photoFull && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setPhotoFull(false)}
+        >
+          <img src={member.photo_url} alt={member.full_name} style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 8, objectFit: 'contain' }} />
+          <div style={{ position: 'absolute', top: 20, right: 20, color: '#fff', fontSize: 28, cursor: 'pointer', lineHeight: 1 }}>×</div>
+        </div>
+      )}
       <div style={s.header}>
         <button style={s.backBtn} onClick={() => navigate(-1)}>←</button>
         <span style={s.headerTitle}>プロフィール</span>
@@ -133,7 +144,7 @@ export default function MemberDetailPage() {
           <div style={s.profileHero}>
             <div style={s.heroCircle1} />
             <div style={s.heroCircle2} />
-            <div style={s.avatarWrap}>
+            <div style={{ ...s.avatarWrap, cursor: member.photo_url ? 'pointer' : 'default' }} onClick={() => member.photo_url && setPhotoFull(true)}>
               {member.photo_url
                 ? <img src={member.photo_url} alt={member.full_name} style={s.avatar} />
                 : <span style={s.avatarIcon}>👤</span>
@@ -146,15 +157,50 @@ export default function MemberDetailPage() {
             {member.role && (
               <div style={s.roleBadge}>{member.role}</div>
             )}
+            {member.line_id && (
+              <a
+                href={`https://line.me/ti/p/~${member.line_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: '#06C755', color: '#fff', borderRadius: 20,
+                  padding: '7px 18px', fontSize: 13, fontWeight: 700,
+                  textDecoration: 'none',
+                }}
+              >
+                💬 LINEで友だち追加
+              </a>
+            )}
           </div>
           <div style={s.content}>
-            {(member.grade || member.gender || member.fav_bands || member.want_parts) && (
+            {(member.main_part || member.grade || member.gender || member.faculty_dept || member.birthday || member.fav_bands || member.want_parts || member.recent_hobby) && (
               <div style={s.card}>
                 <div style={s.cardTitle}>📋 プロフィール情報</div>
+                {member.main_part && (
+                  <div style={s.row}>
+                    <span style={s.rowLabel}>メインパート</span>
+                    <span style={s.rowValue}>{member.main_part.split(',').filter(Boolean).join(' / ')}</span>
+                  </div>
+                )}
+                {member.faculty_dept && (
+                  <div style={s.row}>
+                    <span style={s.rowLabel}>学部・学科</span>
+                    <span style={s.rowValue}>{member.faculty_dept}</span>
+                  </div>
+                )}
                 {member.grade && (
                   <div style={s.row}>
                     <span style={s.rowLabel}>学年</span>
                     <span style={s.rowValue}>{member.grade}年生</span>
+                  </div>
+                )}
+                {member.birthday && (
+                  <div style={s.row}>
+                    <span style={s.rowLabel}>誕生日</span>
+                    <span style={s.rowValue}>
+                      {new Date(member.birthday + 'T00:00:00').toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' })}
+                    </span>
                   </div>
                 )}
                 {member.gender && (
@@ -167,6 +213,12 @@ export default function MemberDetailPage() {
                   <div style={s.row}>
                     <span style={s.rowLabel}>好きなバンド</span>
                     <span style={s.rowValue}>{member.fav_bands}</span>
+                  </div>
+                )}
+                {member.recent_hobby && (
+                  <div style={s.row}>
+                    <span style={s.rowLabel}>最近ハマっていること</span>
+                    <span style={s.rowValue}>{member.recent_hobby}</span>
                   </div>
                 )}
                 {member.want_parts && (

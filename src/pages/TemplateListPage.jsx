@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { getTemplates, deleteTemplate } from '../api.js'
+import { getTemplates, deleteTemplate, getCastCountsByMember } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -25,9 +25,9 @@ const s = {
   headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   card: {
-    background: '#fff', borderRadius: 16, padding: '14px 16px',
-    marginBottom: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, padding: '14px 16px',
+    marginBottom: 10, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
   bandName: { fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 },
   partList: { marginBottom: 10 },
@@ -53,8 +53,8 @@ const s = {
     fontSize: 12, color: '#c2410c', marginBottom: 8, fontWeight: 500,
     border: '1px solid #fed7aa',
   },
-  empty: { textAlign: 'center', color: '#94a3b8', padding: 40 },
-  loading: { textAlign: 'center', color: '#94a3b8', padding: 40 },
+  empty: { textAlign: 'center', color: 'var(--text-muted)', padding: 40 },
+  loading: { textAlign: 'center', color: 'var(--text-muted)', padding: 40 },
 }
 
 export default function TemplateListPage() {
@@ -63,6 +63,7 @@ export default function TemplateListPage() {
   const { currentUser, setFormState, formState } = useApp()
   const [templates, setTemplates] = useState([])
   const [loading, setLoading] = useState(true)
+  const [castCounts, setCastCounts] = useState({})
 
   const fromApply = location.state?.from === 'apply'
 
@@ -73,26 +74,40 @@ export default function TemplateListPage() {
       .finally(() => setLoading(false))
   }, [currentUser.member_id])
 
+  useEffect(() => {
+    if (fromApply && formState.live_id && formState.max_cast_plans != null) {
+      getCastCountsByMember(formState.live_id).then(setCastCounts).catch(console.error)
+    }
+  }, [fromApply, formState.live_id, formState.max_cast_plans])
+
   function applyTemplate(template) {
+    const maxCast = formState.max_cast_plans
+    const removedNames = []
+
     const parts = (template.casts || []).map(c => {
       const hasInactive = c.member && c.member.is_active === false
-      return {
-        part: c.part,
-        member: hasInactive ? null : (c.member || null),
-        _wasInactive: hasInactive,
+      if (hasInactive) return { part: c.part, member: null, _wasInactive: true }
+
+      const isCastFull = maxCast != null && c.member &&
+        (castCounts[c.member.member_id] || 0) >= maxCast
+      if (isCastFull) {
+        removedNames.push(c.member.full_name)
+        return { part: c.part, member: null }
       }
+
+      return { part: c.part, member: c.member || null }
     })
-    const hasInactiveMembers = parts.some(p => p._wasInactive)
 
     setFormState(prev => ({
       ...prev,
-      band_name: prev.band_name || template.band_name,
       parts: parts.map(({ _wasInactive, ...p }) => p),
     }))
 
-    if (hasInactiveMembers) {
-      alert('一部のメンバーが在籍していないため該当パートを空欄にしました')
-    }
+    const messages = []
+    if (parts.some(p => p._wasInactive)) messages.push('一部のメンバーが在籍していないため該当パートを空欄にしました')
+    if (removedNames.length > 0) messages.push(`出演企画数の上限に達しているため以下のメンバーを空欄にしました：\n${removedNames.join('、')}`)
+    if (messages.length > 0) alert(messages.join('\n\n'))
+
     navigate(-1)
   }
 
@@ -119,7 +134,7 @@ export default function TemplateListPage() {
       </div>
       <div style={s.content}>
         {fromApply && (
-          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12, fontWeight: 500 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-sub)', marginBottom: 12, fontWeight: 500 }}>
             テンプレートを選んで引用してください
           </div>
         )}
@@ -127,12 +142,23 @@ export default function TemplateListPage() {
         {!loading && templates.length === 0 && <div style={s.empty}>テンプレートがありません</div>}
         {!loading && templates.map(template => {
           const hasInactive = (template.casts || []).some(c => c.member?.is_active === false)
+          const maxCast = formState.max_cast_plans
+          const castFullNames = fromApply && maxCast != null
+            ? (template.casts || [])
+                .filter(c => c.member && c.member.is_active !== false && (castCounts[c.member.member_id] || 0) >= maxCast)
+                .map(c => c.member.full_name)
+            : []
           return (
             <div key={template.template_id} style={s.card}>
               <div style={s.bandName}>{template.band_name}</div>
               {hasInactive && (
                 <div style={s.inactiveWarning}>
                   ⚠️ 一部のメンバーが在籍していないため引用時に空欄になります
+                </div>
+              )}
+              {castFullNames.length > 0 && (
+                <div style={{ ...s.inactiveWarning, background: '#fef2f2', borderColor: '#fecaca', color: '#991b1b' }}>
+                  ⚠️ 出演上限に達しているため引用時に空欄になります：{castFullNames.join('、')}
                 </div>
               )}
               <div style={s.partList}>

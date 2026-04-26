@@ -1,5 +1,14 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useNavigationType } from 'react-router-dom'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  const navType = useNavigationType()
+  useEffect(() => {
+    if (navType !== 'POP') window.scrollTo(0, 0)
+  }, [pathname, navType])
+  return null
+}
 import { supabase } from './lib/supabase.js'
 import { useApp } from './context/AppContext.jsx'
 import BottomNav, { BottomNavSpacer } from './components/BottomNav.jsx'
@@ -18,13 +27,17 @@ import TemplateListPage from './pages/TemplateListPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
 import RoomReservationPage from './pages/RoomReservationPage.jsx'
 import LiveVideosPage from './pages/LiveVideosPage.jsx'
+import CalendarPage from './pages/CalendarPage.jsx'
+import LiveMenuPage from './pages/LiveMenuPage.jsx'
 
-const AdminHomePage    = lazy(() => import('./pages/AdminHomePage.jsx'))
-const LiveManagePage   = lazy(() => import('./pages/LiveManagePage.jsx'))
-const TimetablePage    = lazy(() => import('./pages/TimetablePage.jsx'))
-const FeesPage         = lazy(() => import('./pages/FeesPage.jsx'))
+const AdminHomePage         = lazy(() => import('./pages/AdminHomePage.jsx'))
+const LiveManagePage        = lazy(() => import('./pages/LiveManagePage.jsx'))
+const TimetablePage         = lazy(() => import('./pages/TimetablePage.jsx'))
+const FeesPage              = lazy(() => import('./pages/FeesPage.jsx'))
 const MemberManagePage      = lazy(() => import('./pages/MemberManagePage.jsx'))
 const LiveVideosManagePage  = lazy(() => import('./pages/LiveVideosManagePage.jsx'))
+const AllApplicationsPage   = lazy(() => import('./pages/AllApplicationsPage.jsx'))
+const CalendarEditPage      = lazy(() => import('./pages/CalendarEditPage.jsx'))
 
 const styles = {
   loading: {
@@ -109,6 +122,22 @@ function LoginPage() {
   )
 }
 
+// ローカル開発用モックユーザー（本番ビルドには含まれない）
+const DEV_MOCK_USER = import.meta.env.DEV ? {
+  member_id: 'dev-mock-id',
+  user_id: 'dev-mock-uid',
+  full_name: '開発 太郎',
+  grade: 2,
+  gender: '男',
+  main_part: 'Gt',
+  photo_url: null,
+  fav_bands: null,
+  want_parts: null,
+  is_active: true,
+  is_admin: true,
+  role: null,
+} : null
+
 function AppRoutes() {
   const { currentUser, setCurrentUser } = useApp()
   const [initializing, setInitializing] = useState(true)
@@ -116,6 +145,13 @@ function AppRoutes() {
   const location = useLocation()
 
   useEffect(() => {
+    // ローカル開発時はモックユーザーで即起動
+    if (import.meta.env.DEV) {
+      setCurrentUser(DEV_MOCK_USER)
+      setInitializing(false)
+      return
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setAuthUser(session.user)
@@ -182,6 +218,17 @@ function AppRoutes() {
 
   return (
     <>
+      {import.meta.env.DEV && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: '#f59e0b', color: '#78350f', fontSize: 10,
+          fontWeight: 800, textAlign: 'center', padding: '3px 0',
+          letterSpacing: 1, pointerEvents: 'none',
+        }}>
+          ⚠ DEV MODE — モックログイン（幹部権限あり）
+        </div>
+      )}
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={
           currentUser ? <Navigate to="/home" replace />
@@ -190,6 +237,7 @@ function AppRoutes() {
         } />
         <Route path="/register" element={authUser ? <RegisterPage /> : <Navigate to="/" replace />} />
         <Route path="/home" element={currentUser ? <HomePage /> : <Navigate to="/" replace />} />
+        <Route path="/live" element={currentUser ? <LiveMenuPage /> : <Navigate to="/" replace />} />
         <Route path="/live-select" element={currentUser ? <LiveSelectPage /> : <Navigate to="/" replace />} />
         <Route path="/apply/a" element={currentUser ? <ApplyPageA /> : <Navigate to="/" replace />} />
         <Route path="/apply/b" element={currentUser ? <ApplyPageB /> : <Navigate to="/" replace />} />
@@ -202,12 +250,15 @@ function AppRoutes() {
         <Route path="/contact" element={currentUser ? <ContactPage /> : <Navigate to="/" replace />} />
         <Route path="/room-reservation" element={currentUser ? <RoomReservationPage /> : <Navigate to="/" replace />} />
         <Route path="/live-videos" element={currentUser ? <LiveVideosPage /> : <Navigate to="/" replace />} />
+        <Route path="/calendar" element={currentUser ? <CalendarPage /> : <Navigate to="/" replace />} />
         <Route path="/admin" element={<AdminGuard><Suspense fallback={fallback}><AdminHomePage /></Suspense></AdminGuard>} />
         <Route path="/admin/lives" element={<AdminGuard><Suspense fallback={fallback}><LiveManagePage /></Suspense></AdminGuard>} />
         <Route path="/admin/timetable" element={<AdminGuard><Suspense fallback={fallback}><TimetablePage /></Suspense></AdminGuard>} />
         <Route path="/admin/fees" element={<AdminGuard><Suspense fallback={fallback}><FeesPage /></Suspense></AdminGuard>} />
         <Route path="/admin/members" element={<AdminGuard><Suspense fallback={fallback}><MemberManagePage /></Suspense></AdminGuard>} />
         <Route path="/admin/live-videos" element={<AdminGuard><Suspense fallback={fallback}><LiveVideosManagePage /></Suspense></AdminGuard>} />
+        <Route path="/admin/applications" element={<AdminGuard><Suspense fallback={fallback}><AllApplicationsPage /></Suspense></AdminGuard>} />
+        <Route path="/admin/calendar" element={<AdminGuard><Suspense fallback={fallback}><CalendarEditPage /></Suspense></AdminGuard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {showBottomNav && <BottomNavSpacer />}

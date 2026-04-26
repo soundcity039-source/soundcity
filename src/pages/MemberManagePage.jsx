@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getMembers, updateMember } from '../api.js'
 import { useApp } from '../context/AppContext.jsx'
 
-const ROLES = ['支部長', '副支部長', '会計', 'ライブ係', 'PA', '新歓係']
+const ROLES = ['支部長', '副支部長', '会計', 'ライブ係', 'PA', '新歓係', '合宿係']
 const PROTECTED_ROLES = ['支部長', '会計']
 const SUPER_ROLES = ['支部長', '会計']
 
@@ -14,6 +14,7 @@ const ROLE_COLORS = {
   'ライブ係': { bg: '#ede9fe', color: '#5b21b6' },
   'PA':      { bg: '#f0fdf4', color: '#166534' },
   '新歓係':  { bg: '#fff7ed', color: '#9a3412' },
+  '合宿係':  { bg: '#e0f2fe', color: '#0369a1' },
 }
 
 const SORT_OPTIONS = [
@@ -23,9 +24,9 @@ const SORT_OPTIONS = [
 ]
 
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -44,30 +45,30 @@ const s = {
   headerTitle: { fontSize: 18, fontWeight: 800, letterSpacing: -0.3, position: 'relative' },
   content: { padding: '10px 12px', maxWidth: 480, margin: '0 auto' },
   searchInput: {
-    width: '100%', padding: '8px 12px', border: '1.5px solid #e2e8f0',
+    width: '100%', padding: '8px 12px', border: '1.5px solid var(--border)',
     borderRadius: 10, fontSize: 14, boxSizing: 'border-box', marginBottom: 8,
-    background: '#f8fafc', outline: 'none',
+    background: 'var(--input-bg)', outline: 'none',
   },
   controlRow: { display: 'flex', gap: 6, marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' },
   filterBtn: {
-    padding: '5px 12px', border: '1.5px solid #e2e8f0', borderRadius: 20,
-    background: '#fff', fontSize: 12, cursor: 'pointer', color: '#475569', whiteSpace: 'nowrap', fontWeight: 500,
+    padding: '5px 12px', border: '1.5px solid var(--border)', borderRadius: 20,
+    background: 'var(--card-bg)', fontSize: 12, cursor: 'pointer', color: '#475569', whiteSpace: 'nowrap', fontWeight: 500,
   },
   filterBtnActive: { background: '#1e293b', color: '#fff', borderColor: '#1e293b', fontWeight: 700 },
   sortSelect: {
-    padding: '5px 8px', border: '1.5px solid #e2e8f0', borderRadius: 20,
-    background: '#fff', fontSize: 12, color: '#475569', marginLeft: 'auto', fontWeight: 500,
+    padding: '5px 8px', border: '1.5px solid var(--border)', borderRadius: 20,
+    background: 'var(--card-bg)', fontSize: 12, color: '#475569', marginLeft: 'auto', fontWeight: 500,
   },
   filterRow2: { display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' },
   filterSelect: {
-    padding: '5px 8px', border: '1.5px solid #e2e8f0', borderRadius: 20,
-    background: '#fff', fontSize: 12, color: '#475569', fontWeight: 500,
+    padding: '5px 8px', border: '1.5px solid var(--border)', borderRadius: 20,
+    background: 'var(--card-bg)', fontSize: 12, color: '#475569', fontWeight: 500,
   },
   // Compact row card
   card: {
-    background: '#fff', borderRadius: 10, marginBottom: 4,
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-    border: '1px solid rgba(0,0,0,0.05)', overflow: 'hidden',
+    background: 'var(--card-bg)', borderRadius: 10, marginBottom: 4,
+    boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)', overflow: 'hidden',
   },
   cardInactive: { opacity: 0.45 },
   cardRow: {
@@ -81,8 +82,8 @@ const s = {
   },
   info: { flex: 1, minWidth: 0 },
   nameRow: { display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' },
-  name: { fontSize: 14, fontWeight: 700, color: '#0f172a' },
-  metaText: { fontSize: 11, color: '#94a3b8' },
+  name: { fontSize: 14, fontWeight: 700, color: 'var(--text)' },
+  metaText: { fontSize: 11, color: 'var(--text-muted)' },
   badges: { display: 'flex', gap: 3, flexWrap: 'wrap', marginTop: 2 },
   badge: { padding: '1px 6px', borderRadius: 8, fontSize: 10, fontWeight: 600 },
   badgeAdmin:    { background: '#e9d8fd', color: '#6b46c1' },
@@ -93,8 +94,8 @@ const s = {
   actionArea: { padding: '8px 12px 12px', borderTop: '1px solid #f8fafc', background: '#fafafa' },
   actionRow: { display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' },
   toggleBtn: {
-    padding: '5px 10px', border: '1px solid #ddd', borderRadius: 6,
-    background: '#fff', fontSize: 12, cursor: 'pointer', color: '#555', whiteSpace: 'nowrap',
+    padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 6,
+    background: 'var(--card-bg)', fontSize: 12, cursor: 'pointer', color: 'var(--text-sub)', whiteSpace: 'nowrap',
   },
   toggleBtnDanger: {
     padding: '5px 10px', border: '1px solid #fca5a5', borderRadius: 6,
@@ -107,14 +108,14 @@ const s = {
   roleRow: { display: 'flex', alignItems: 'center', gap: 8 },
   roleLabel: { fontSize: 12, color: '#888', whiteSpace: 'nowrap' },
   roleSelect: {
-    flex: 1, padding: '5px 8px', border: '1px solid #ddd', borderRadius: 6,
-    fontSize: 12, background: '#fff',
+    flex: 1, padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 6,
+    fontSize: 12, background: 'var(--card-bg)',
   },
   empty: { textAlign: 'center', color: '#aaa', padding: 40 },
   loading: { textAlign: 'center', color: '#aaa', padding: 40 },
 }
 
-const ROLE_ORDER = ['支部長', '副支部長', '会計', 'ライブ係', 'PA', '新歓係']
+const ROLE_ORDER = ['支部長', '副支部長', '会計', 'ライブ係', 'PA', '新歓係', '合宿係']
 
 export default function MemberManagePage() {
   const navigate = useNavigate()

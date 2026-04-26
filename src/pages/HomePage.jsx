@@ -2,14 +2,14 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 
 const menus = [
-  { label: 'ライブ',         icon: '🎸', path: '/live',             color: '#dcfce7', adminOnly: false },
-  { label: 'カレンダー',     icon: '📆', path: '/calendar',         color: '#dbeafe', adminOnly: false },
-  { label: 'メンバー一覧',   icon: '👥', path: '/members',          color: '#ede9fe', adminOnly: false },
-  { label: '練習室予約',     icon: '🎵', path: '/room-reservation', color: '#ecfeff', adminOnly: false },
-  { label: '過去ライブ動画', icon: '🎬', path: '/live-videos',      color: '#fce7f3', adminOnly: false },
-  { label: 'プロフィール',   icon: '👤', path: '/profile/edit',     color: '#ffedd5', adminOnly: false },
-  { label: '運営へ連絡',     icon: '✉️', path: '/contact',          color: '#f1f5f9', adminOnly: false },
-  { label: '管理画面',       icon: '⚙️', path: '/admin',            color: '#fee2e2', adminOnly: true  },
+  { label: 'ライブ',         icon: '🎸', path: '/live',             color: '#dcfce7', desc: '応募・応募一覧を確認',       adminOnly: false },
+  { label: 'カレンダー',     icon: '📆', path: '/calendar',         color: '#dbeafe', desc: 'ライブ・合宿・予定を確認',   adminOnly: false },
+  { label: 'メンバー一覧',   icon: '👥', path: '/members',          color: '#ede9fe', desc: 'サークル員のプロフィール',   adminOnly: false },
+  { label: '練習室予約',     icon: '🎵', path: '/room-reservation', color: '#ecfeff', desc: '空きコマを確認・予約',       adminOnly: false },
+  { label: '過去ライブ動画', icon: '🎬', path: '/live-videos',      color: '#fce7f3', desc: '過去のライブ動画を視聴',     adminOnly: false },
+  { label: 'プロフィール',   icon: '👤', path: '/profile/edit',     color: '#ffedd5', desc: '名前・パート・写真を編集',   adminOnly: false },
+  { label: '運営へ連絡',     icon: '✉️', path: '/contact',          color: '#f1f5f9', desc: '幹部へメッセージを送る',     adminOnly: false },
+  { label: '管理画面',       icon: '⚙️', path: '/admin',            color: '#fee2e2', desc: '幹部専用の管理メニュー',     adminOnly: true  },
 ]
 
 const s = {
@@ -85,6 +85,7 @@ const s = {
     background: 'rgba(255,255,255,0.6)',
   },
   menuLabel: { fontSize: 14, fontWeight: 700, color: '#1e293b' },
+  menuDesc: { fontSize: 11, color: '#64748b', marginTop: 3, fontWeight: 500 },
   arrow: { position: 'absolute', right: 12, bottom: 14, fontSize: 12, color: '#94a3b8' },
 }
 
@@ -127,6 +128,7 @@ export default function HomePage() {
             >
               <div style={s.iconCircle}>{menu.icon}</div>
               <span style={s.menuLabel}>{menu.label}</span>
+              <span style={s.menuDesc}>{menu.desc}</span>
               <span style={s.arrow}>→</span>
             </button>
           ))}

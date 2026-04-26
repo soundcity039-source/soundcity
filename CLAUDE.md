@@ -36,10 +36,8 @@ soundcity/
 │   │   │   ├── BottomNav.jsx
 │   │   │   ├── PartSelector.jsx
 │   │   │   ├── MemberSearchModal.jsx
-│   │   │   ├── PhotoUpload.jsx
-│   │   │   └── ThemeSelectModal.jsx
+│   │   │   └── PhotoUpload.jsx
 │   │   └── pages/             # 各画面
-│   ├── .env                   # VITE_GAS_URL, VITE_LIFF_ID（未使用）
 │   ├── .env.local             # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY（ビルド時に使用）
 │   ├── vite.config.js         # base: '/soundcity/'
 │   └── package.json
@@ -332,7 +330,8 @@ DB制約 `UNIQUE(date, slot)` で重複予約を防止（エラーコード `235
 
 ### テーマシステム
 `theme.js` で CSS カスタムプロパティを定義し `document.documentElement.style.setProperty` で適用。
-`ThemeSelectModal` で各テーマカードがそのテーマ自身の配色を使ってプレビュー表示する。
+`AppContext` がマウント時に `localStorage` の `sc_theme` を読み込んで自動適用する。
+テーマ変更 UI（ThemeSelectModal）は現在ホーム画面から取り外されている。
 
 ### プロフィール写真の圧縮
 `PhotoUpload.jsx` の `CropModal.handleConfirm()` でアップロード前に Canvas でリサイズ・圧縮する。

@@ -2,14 +2,14 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 
 const menus = [
-  { label: 'ライブに応募する', icon: '🎸', path: '/live-select',    color: '#dcfce7', adminOnly: false },
-  { label: 'ライブ応募一覧',  icon: '📋', path: '/applications',   color: '#dbeafe', adminOnly: false },
-  { label: 'サークルメンバー一覧', icon: '👥', path: '/members',   color: '#ede9fe', adminOnly: false },
-  { label: '練習室予約',  icon: '🎵', path: '/room-reservation',   color: '#ecfeff', adminOnly: false },
+  { label: 'ライブ',         icon: '🎸', path: '/live',             color: '#dcfce7', adminOnly: false },
+  { label: 'カレンダー',     icon: '📆', path: '/calendar',         color: '#dbeafe', adminOnly: false },
+  { label: 'メンバー一覧',   icon: '👥', path: '/members',          color: '#ede9fe', adminOnly: false },
+  { label: '練習室予約',     icon: '🎵', path: '/room-reservation', color: '#ecfeff', adminOnly: false },
   { label: '過去ライブ動画', icon: '🎬', path: '/live-videos',      color: '#fce7f3', adminOnly: false },
-  { label: 'プロフィール', icon: '👤', path: '/profile/edit',       color: '#ffedd5', adminOnly: false },
-  { label: '運営へ連絡',  icon: '✉️', path: '/contact',            color: '#f1f5f9', adminOnly: false },
-  { label: '管理画面',    icon: '⚙️', path: '/admin',              color: '#fee2e2', adminOnly: true  },
+  { label: 'プロフィール',   icon: '👤', path: '/profile/edit',     color: '#ffedd5', adminOnly: false },
+  { label: '運営へ連絡',     icon: '✉️', path: '/contact',          color: '#f1f5f9', adminOnly: false },
+  { label: '管理画面',       icon: '⚙️', path: '/admin',            color: '#fee2e2', adminOnly: true  },
 ]
 
 const s = {

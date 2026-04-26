@@ -3,10 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext.jsx'
 import { createPlan, updatePlan, createTemplate } from '../api.js'
 
+function parseSeNote(seNote) {
+  if (!seNote) return []
+  const lines = seNote.split('\n')
+  const items = []
+  if (lines[0]?.trim()) items.push({ label: 'SE', value: lines[0].trim() })
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i]?.trim()) items.push({ label: `${i}曲目`, value: lines[i].trim() })
+  }
+  return items
+}
+
 const s = {
-  page: { minHeight: '100vh', background: '#f1f5f9', paddingBottom: 40 },
+  page: { minHeight: '100vh', background: 'var(--page-bg)', color: 'var(--text)', paddingBottom: 40 },
   header: {
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'var(--header-grad)',
     color: '#fff', padding: '16px 20px 20px',
     display: 'flex', alignItems: 'center', gap: 12,
     position: 'relative', overflow: 'hidden',
@@ -30,17 +41,17 @@ const s = {
   stepActive: { background: '#fff', width: 20, borderRadius: 4 },
   content: { padding: '16px', maxWidth: 480, margin: '0 auto' },
   card: {
-    background: '#fff', borderRadius: 16, padding: '20px 16px',
-    marginBottom: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    border: '1px solid rgba(0,0,0,0.04)',
+    background: 'var(--card-bg)', borderRadius: 16, padding: '20px 16px',
+    marginBottom: 12, boxShadow: 'var(--card-shadow)',
+    border: '1px solid var(--card-border)',
   },
   title: { fontSize: 13, fontWeight: 800, color: '#475569', marginBottom: 14, letterSpacing: 0.3 },
   row: {
     display: 'flex', alignItems: 'center',
     borderBottom: '1px solid #f8fafc', padding: '10px 0',
   },
-  rowLabel: { minWidth: 80, fontSize: 12, color: '#94a3b8', fontWeight: 600 },
-  rowValue: { fontSize: 14, color: '#1e293b', flex: 1, fontWeight: 600 },
+  rowLabel: { minWidth: 80, fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 },
+  rowValue: { fontSize: 14, color: 'var(--text)', flex: 1, fontWeight: 600 },
   partList: { paddingLeft: 0, listStyle: 'none', margin: 0 },
   partRow: { display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid #f8fafc' },
   partBadge: {
@@ -57,7 +68,7 @@ const s = {
   },
   submitBtn: {
     width: '100%', padding: '15px',
-    background: 'linear-gradient(135deg, #06C755 0%, #00a846 100%)',
+    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
     color: '#fff', border: 'none', borderRadius: 12,
     fontSize: 16, fontWeight: 800, cursor: 'pointer',
     boxShadow: '0 4px 16px rgba(6,199,85,0.3)',
@@ -90,8 +101,12 @@ export default function ApplyConfirmPage() {
         live_id: formState.live_id,
         band_name: formState.band_name,
         song_count: Number(formState.song_count),
-        leader_id: currentUser.member_id,
+        leader_id: formState.editing_leader_id || currentUser.member_id,
         casts: castData,
+        mic_note: formState.mic_note || null,
+        sound_note: formState.sound_note || null,
+        se_note: formState.se_note || null,
+        light_note: formState.light_note || null,
       }
 
       if (formState.editing_plan_id) {
@@ -111,7 +126,7 @@ export default function ApplyConfirmPage() {
       }
 
       setDone(true)
-      setTimeout(() => navigate('/applications'), 2000)
+      setTimeout(() => navigate(formState.return_path || '/applications'), 2000)
     } catch (e) {
       alert('エラーが発生しました。もう一度お試しください')
       console.error(e)
@@ -160,7 +175,7 @@ export default function ApplyConfirmPage() {
             <span style={s.rowValue}>{formState.song_count}曲</span>
           </div>
           <div style={{ paddingTop: 14 }}>
-            <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 700, marginBottom: 8, letterSpacing: 0.3 }}>パート一覧</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 8, letterSpacing: 0.3 }}>パート一覧</div>
             <ul style={s.partList}>
               {formState.parts.map((p, i) => (
                 <li key={i} style={s.partRow}>
@@ -172,6 +187,37 @@ export default function ApplyConfirmPage() {
               ))}
             </ul>
           </div>
+          {formState.mic_note && (
+            <div style={{ ...s.row, flexDirection: 'column', alignItems: 'flex-start' }}>
+              <span style={{ ...s.rowLabel, marginBottom: 4 }}>マイク</span>
+              <span style={{ ...s.rowValue, fontSize: 13, whiteSpace: 'pre-wrap' }}>{formState.mic_note}</span>
+            </div>
+          )}
+          {formState.sound_note && (
+            <div style={{ ...s.row, flexDirection: 'column', alignItems: 'flex-start' }}>
+              <span style={{ ...s.rowLabel, marginBottom: 4 }}>音響要望</span>
+              <span style={{ ...s.rowValue, fontSize: 13, whiteSpace: 'pre-wrap' }}>{formState.sound_note}</span>
+            </div>
+          )}
+          {parseSeNote(formState.se_note).length > 0 && (
+            <div style={{ ...s.row, flexDirection: 'column', alignItems: 'flex-start' }}>
+              <span style={{ ...s.rowLabel, marginBottom: 6 }}>SE・曲目</span>
+              <div>
+                {parseSeNote(formState.se_note).map((item, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 3 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', minWidth: 40 }}>{item.label}</span>
+                    <span style={{ fontSize: 13, color: 'var(--text)' }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {formState.light_note && (
+            <div style={{ ...s.row, flexDirection: 'column', alignItems: 'flex-start', borderBottom: 'none' }}>
+              <span style={{ ...s.rowLabel, marginBottom: 4 }}>照明</span>
+              <span style={{ ...s.rowValue, fontSize: 13, whiteSpace: 'pre-wrap' }}>{formState.light_note}</span>
+            </div>
+          )}
         </div>
 
         {formState.save_as_template && (

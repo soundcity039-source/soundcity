@@ -78,6 +78,13 @@ const s = {
 const STATUS_LABELS = { open: '応募受付中', closed: '締切済み', done: '終了' }
 const STATUS_STYLES = { open: s.badgeOpen, closed: s.badgeClosed, done: s.badgeDone }
 
+function getDisplayStatus(live) {
+  if (live.status === 'open' && live.deadline && new Date(live.deadline) < new Date()) {
+    return 'closed'
+  }
+  return live.status
+}
+
 const EMPTY_FORM = {
   live_name: '', date1: '', date2: '', deadline: '',
   fee_mode: 'flat', fee_flat: '', fee_1plan: '', fee_2plan: '', fee_3plan: '',
@@ -189,8 +196,8 @@ export default function LiveManagePage() {
             <div style={s.meta}>📅 {live.date1}{live.date2 ? ` / ${live.date2}` : ''}</div>
             <div style={s.meta}>⏰ 締切：{live.deadline}</div>
             <div style={s.meta}>料金モード：{live.fee_mode === 'flat' ? `一律 ${live.fee_flat}円` : '段階制'}</div>
-            <span style={{ ...s.badge, ...(STATUS_STYLES[live.status] || s.badgeDone) }}>
-              {STATUS_LABELS[live.status] || live.status}
+            <span style={{ ...s.badge, ...(STATUS_STYLES[getDisplayStatus(live)] || s.badgeDone) }}>
+              {STATUS_LABELS[getDisplayStatus(live)] || live.status}
             </span>
             <div>
               <button style={s.editBtn} onClick={() => openEdit(live)}>編集</button>

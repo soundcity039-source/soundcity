@@ -161,13 +161,19 @@
     background: #f0fdf4;
     border-color: #bbf7d0;
   }
+  .alert-card.red {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
   .alert-icon { font-size: 22px; flex-shrink: 0; line-height: 1.4; }
   .alert-body { font-size: 14px; color: #7c3a0a; line-height: 1.6; }
   .alert-card.blue .alert-body { color: #1e40af; }
   .alert-card.green .alert-body { color: #166534; }
+  .alert-card.red .alert-body { color: #991b1b; }
   .alert-body strong { font-weight: 800; display: block; margin-bottom: 2px; color: #c2410c; }
   .alert-card.blue .alert-body strong { color: #1d4ed8; }
   .alert-card.green .alert-body strong { color: #15803d; }
+  .alert-card.red .alert-body strong { color: #991b1b; }
 
   .menu-grid {
     display: grid;
@@ -189,10 +195,9 @@
   .menu-item.purple { border-top: 3px solid #8b5cf6; }
   .menu-item.cyan   { border-top: 3px solid #06b6d4; }
   .menu-item.pink   { border-top: 3px solid #ec4899; }
-  .menu-item.orange { border-top: 3px solid #f59e0b; }
+  .menu-item.orange { border-top: 3px solid #f97316; }
   .menu-item.gray   { border-top: 3px solid #64748b; }
   .menu-item.red    { border-top: 3px solid #ef4444; }
-  .menu-item.teal   { border-top: 3px solid #14b8a6; }
 
   .timeline { position: relative; padding-left: 28px; }
   .timeline::before {
@@ -222,6 +227,7 @@
   .badge-gray   { background: #f1f5f9; color: #475569; }
   .badge-orange { background: #ffedd5; color: #9a3412; }
   .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .badge-red    { background: #fee2e2; color: #991b1b; }
 
   .info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .info-table th {
@@ -295,6 +301,16 @@
     font-weight: 600;
   }
 
+  .legend-row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+  }
+  .legend-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 13px; color: #334155; font-weight: 600;
+  }
+
   @media (max-width: 400px) {
     .menu-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 26px; }
@@ -320,7 +336,7 @@
     <div class="card">
       <p style="font-size:15px; color:#475569; line-height:1.8;">
         SoundCityツールは軽音サークルのための<strong style="color:#06C755;">ライブ管理アプリ</strong>です。<br>
-        スマホのブラウザだけで、ライブへの応募・メンバー確認・練習室の予約など、サークル活動に必要なことがひとまとめにできます。
+        スマホのブラウザだけで、ライブへの応募・カレンダー確認・メンバー確認・練習室の予約など、サークル活動に必要なことがひとまとめにできます。
       </p>
     </div>
   </div>
@@ -343,8 +359,8 @@
       <div class="step-body">
         <h3>URLをChromeやSafariで開く</h3>
         <p>
-          <a href="https://soundcity039-source.github.io/soundcity" style="color:#06C755; font-weight:700;">
-            soundcity039-source.github.io/soundcity
+          <a href="https://kasugayuji0716-art.github.io/soundcity" style="color:#06C755; font-weight:700;">
+            kasugayuji0716-art.github.io/soundcity
           </a>
         </p>
       </div>
@@ -404,28 +420,23 @@
     <div class="menu-grid">
       <div class="menu-item green">
         <span class="menu-item-icon">🎸</span>
-        <div class="menu-item-name">ライブに応募する</div>
-        <div class="menu-item-desc">バンド名・曲数・メンバーを入力して応募</div>
+        <div class="menu-item-name">ライブ</div>
+        <div class="menu-item-desc">応募・応募一覧を確認。上限チェックあり</div>
       </div>
       <div class="menu-item blue">
-        <span class="menu-item-icon">📋</span>
-        <div class="menu-item-name">ライブ応募一覧</div>
-        <div class="menu-item-desc">全員の応募内容を確認。自分の企画は編集・取り消し可</div>
-      </div>
-      <div class="menu-item teal">
-        <span class="menu-item-icon">📑</span>
-        <div class="menu-item-name">テンプレート</div>
-        <div class="menu-item-desc">よく使うバンド構成を保存して次回の応募で呼び出せる</div>
+        <span class="menu-item-icon">📆</span>
+        <div class="menu-item-name">カレンダー</div>
+        <div class="menu-item-desc">ライブ・合宿・練習室予約を月別カレンダーで確認</div>
       </div>
       <div class="menu-item purple">
         <span class="menu-item-icon">👥</span>
-        <div class="menu-item-name">サークルメンバー</div>
-        <div class="menu-item-desc">メンバーのプロフィールを見る・LINEで友だち追加</div>
+        <div class="menu-item-name">メンバー一覧</div>
+        <div class="menu-item-desc">メンバーのプロフィールや出演歴を確認</div>
       </div>
       <div class="menu-item cyan">
         <span class="menu-item-icon">🎵</span>
         <div class="menu-item-name">練習室予約</div>
-        <div class="menu-item-desc">音楽練習室5のカレンダー予約</div>
+        <div class="menu-item-desc">音楽練習室5のカレンダー予約（スワイプ対応）</div>
       </div>
       <div class="menu-item pink">
         <span class="menu-item-icon">🎬</span>
@@ -450,6 +461,35 @@
     </div>
   </div>
 
+  <!-- カレンダー -->
+  <div class="section">
+    <div class="section-label">How to</div>
+    <h2>📆 カレンダーを見る</h2>
+    <div class="card">
+      <p style="font-size:14px; color:#475569; margin-bottom:14px;">サークルのスケジュールをひとまとめに確認できます。左右スワイプで月を移動できます。</p>
+      <div class="legend-row">
+        <div class="legend-chip">🎸 ライブ</div>
+        <div class="legend-chip">🏕️ 合宿</div>
+        <div class="legend-chip">📅 イベント</div>
+        <div class="legend-chip">🎵 練習室</div>
+      </div>
+    </div>
+    <div class="alert-card green">
+      <span class="alert-icon">🎵</span>
+      <div class="alert-body">
+        <strong>バンド予約がメンバー全員に表示される！</strong>
+        バンドで練習室を予約すると、そのバンドの出演メンバー全員のカレンダーに予約が表示されます。
+      </div>
+    </div>
+    <div class="alert-card blue">
+      <span class="alert-icon">📌</span>
+      <div class="alert-body">
+        <strong>ライブ・合宿日程は随時更新</strong>
+        今後のライブ日程・合宿日程などは幹部が随時更新します。
+      </div>
+    </div>
+  </div>
+
   <!-- ライブ応募 -->
   <div class="section">
     <div class="section-label">How to</div>
@@ -459,7 +499,7 @@
         <div class="tl-item">
           <div class="tl-dot"></div>
           <h3>応募したいライブを選ぶ</h3>
-          <p>受付中のライブが表示されます。締切済みは選べません。</p>
+          <p>受付中のライブが表示されます。出演上限・代表者上限の進捗も確認できます。</p>
         </div>
         <div class="tl-item">
           <div class="tl-dot"></div>
@@ -469,13 +509,21 @@
         <div class="tl-item">
           <div class="tl-dot"></div>
           <h3>各パートのメンバーを選択</h3>
-          <p>名前で検索してメンバーを選べます。未定のパートは空欄でもOK。パートは自由に追加できます。</p>
+          <p>名前で検索してメンバーを選べます。出演上限に達しているメンバーは赤い「上限」バッジが表示され選べません。未定のパートは空欄でもOK。</p>
         </div>
         <div class="tl-item" style="margin-bottom:0">
           <div class="tl-dot" style="background:#0ea5e9; box-shadow: 0 0 0 2px #0ea5e9;"></div>
           <h3>内容を確認して「送信」</h3>
           <p>これで応募完了！締切前なら「ライブ応募一覧」から編集・取り消しもできます。</p>
         </div>
+      </div>
+    </div>
+
+    <div class="alert-card blue">
+      <span class="alert-icon">📑</span>
+      <div class="alert-body">
+        <strong>テンプレートが便利！</strong>
+        よく使うバンド構成を保存しておくと、次回の応募で呼び出せます。テンプレート引用時に出演上限に達しているメンバーは自動的に空欄になります。
       </div>
     </div>
   </div>
@@ -530,7 +578,7 @@
     <div class="step-card">
       <div class="step-num">1</div>
       <div class="step-body">
-        <h3>カレンダーで日付をタップ</h3>
+        <h3>スワイプで月を移動・日付をタップ</h3>
         <p>🟢緑=空き　🔵青=自分の予約　⚫グレー=埋まってる</p>
       </div>
     </div>
@@ -538,15 +586,23 @@
       <div class="step-num">2</div>
       <div class="step-body">
         <h3>予約したい枠を選んで入力</h3>
-        <p>「個人使用」か「バンド使用（企画名あり）」を選択して「予約する」。</p>
+        <p>「個人練習」か「バンド（企画を選択）」を選んで「予約する」。バンドは自分の応募済み企画から選べます。</p>
       </div>
     </div>
 
     <div class="alert-card">
-      <span class="alert-icon">💡</span>
+      <span class="alert-icon">⏰</span>
       <div class="alert-body">
-        <strong>各枠は1グループのみ予約できます</strong>
-        すでに誰かが予約している枠は取れません。自分の予約は取り消すことができます。
+        <strong>個人練習は1週間先まで</strong>
+        個人練習の予約は本日から1週間先までしか取れません。バンド練習は制限なし。
+      </div>
+    </div>
+
+    <div class="alert-card red">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body">
+        <strong>利用規約を守ってください</strong>
+        サークルメンバーの練習目的のみ利用可能です。外部の人の利用・練習以外の目的での利用は禁止です。違反した場合は予約利用を制限するなどの罰則があります。
       </div>
     </div>
   </div>
@@ -596,7 +652,17 @@
 
     <div class="faq-item">
       <div class="faq-q">応募を取り消したい</div>
-      <div class="faq-a">「ライブ応募一覧」を開き、取り消したい企画の <strong>›</strong> を押して「取り消し」ボタンをタップ。<br>⚠️ 締切後は変更できないので幹部に連絡してください。</div>
+      <div class="faq-a">「ライブ」→「応募一覧を見る」を開き、取り消したい企画の <strong>›</strong> を押して「取り消し」ボタンをタップ。<br>⚠️ 締切後は変更できないので幹部に連絡してください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">メンバーが「上限」と表示されて選べない</div>
+      <div class="faq-a">そのライブの出演企画数の上限に達しているため選択できません。上限の設定を確認したい場合は幹部にお問い合わせください。</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">テンプレートを引用したらメンバーが減っていた</div>
+      <div class="faq-a">退部・卒業済みのメンバー、またはこのライブの出演上限に達しているメンバーは自動的に空欄になります。</div>
     </div>
 
     <div class="faq-item">
@@ -630,7 +696,7 @@
 <div style="padding: 0 16px;">
   <div class="footer">
     <strong>🎸 SoundCityツール</strong>
-    <a href="https://soundcity039-source.github.io/soundcity">アプリを開く →</a>
+    <a href="https://kasugayuji0716-art.github.io/soundcity">アプリを開く →</a>
     <p style="margin-top:16px; font-size:11px;">困ったことがあれば運営メニューから幹部に連絡してください</p>
   </div>
 </div>
